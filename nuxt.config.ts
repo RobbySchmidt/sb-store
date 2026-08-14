@@ -5,6 +5,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
 
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+  },
+
   modules: ['@pinia/nuxt', '@nuxtjs/supabase'],
   
   css: ['~/assets/css/main.css'],
