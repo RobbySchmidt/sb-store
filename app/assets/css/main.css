@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  /* custom breakpoints */
+  --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 128rem;
+
+  /* fluid font sizes */
+  --text-f-lg: clamp(1rem, 0.97rem + 0.16vw, 1.125rem); /* 16px - 18px */
+  --text-f-xl: clamp(1rem, 0.93rem + 0.33vw, 1.25rem); /* 16px - 20px */
+  --text-f-2xl: clamp(1.125rem, 1.03rem + 0.49vw, 1.5rem); /* 18px - 24px */
+  --text-f-3xl: clamp(1.545rem, 1.46rem + 0.43vw, 1.875rem); /* 24.72px - 30px */
+  --text-f-4xl: clamp(1.75rem, 1.62rem + 0.66vw, 2.25rem); /* 28px - 36px */
+  --text-f-5xl: clamp(2rem, 1.74rem + 1.32vw, 3rem); /* 32px - 48px */
+  --text-f-6xl: clamp(2.45rem, 2.11rem + 1.71vw, 3.75rem); /* 39.2px - 60px */
+  --text-f-7xl: clamp(2.8rem, 2.35rem + 2.24vw, 4.5rem); /* 44.8px - 72px */
+  --text-f-8xl: clamp(3.5rem, 2.84rem + 3.29vw, 6rem); /* 56px - 96px */
+  --text-f-9xl: clamp(4.45rem, 3.52rem + 4.67vw, 8rem); /* 71.2px - 128px */
+
+  /* fluid spaces */
+  --spacing-f-6: clamp(1rem, 0.78rem + 1.11vw, 1.5rem);
+  --spacing-f-8: clamp(1.5rem, 1.37rem + 0.66vw, 2rem);
+  --spacing-f-12: clamp(2rem, 1.74rem + 1.32vw, 3rem);
+  --spacing-f-16: clamp(2.25rem, 1.79rem + 2.3vw, 4rem);
+  --spacing-f-20: clamp(2.75rem, 2.16rem + 2.96vw, 5rem);
+  --spacing-f-24: clamp(3rem, 2.21rem + 3.95vw, 6rem);
+  --spacing-f-28: clamp(3.5rem, 2.58rem + 4.61vw, 7rem);
+  --spacing-f-32: clamp(3.75rem, 2.63rem + 5.59vw, 8rem);
+  --spacing-f-36: clamp(4.25rem, 3rem + 6.25vw, 9rem);
+  --spacing-f-40: clamp(4.5rem, 3.05rem + 7.24vw, 10rem);
+  --spacing-f-44: clamp(5rem, 3.42rem + 7.89vw, 11rem);
+  --spacing-f-48: clamp(5.25rem, 3.47rem + 8.88vw, 12rem);
+  --spacing-f-52: clamp(5.75rem, 3.84rem + 9.54vw, 13rem);
+  --spacing-f-56: clamp(6rem, 3.89rem + 10.53vw, 14rem);
+  --spacing-f-60: clamp(6.5rem, 4.26rem + 11.18vw, 15rem);
+  --spacing-f-64: clamp(7rem, 4.63rem + 11.84vw, 16rem);
+  --spacing-f-72: clamp(7.5rem, 4.74rem + 13.82vw, 18rem);
+  --spacing-f-80: clamp(8.5rem, 5.47rem + 15.13vw, 20rem);
+  --spacing-f-96: clamp(10rem, 6.32rem + 18.42vw, 24rem);
+}
