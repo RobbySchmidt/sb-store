@@ -8,7 +8,8 @@ const featuredSlugs = ['ember-blend-dark-roast', 'sunrise-single-origin-ethiopia
 const featured = computed(() =>
   featuredSlugs.map(s => products.value.find(p => p.slug === s)).filter(Boolean) as NonNullable<typeof products.value[0]>[])
 
-const heroImage = computed(() => products.value.find(p => p.slug === 'ember-blend-dark-roast')?.image_url)
+const heroImage = computed(() => products.value.find(p => p.slug === 'house-espresso-classic')?.image_url)
+const batch = batchInfo()
 const tanneryImage = computed(() => products.value.find(p => p.slug === 'glass-carafe-brewer')?.image_url)
 
 const tileImages: Record<string, string> = {
@@ -31,46 +32,41 @@ useHead({ title: 'Ember & Oak — Small-batch coffee roastery' })
 
 <template>
   <div>
-    <!-- ===== dark hero band ===== -->
-    <section class="relative overflow-hidden bg-espresso pb-[130px] md:pb-[120px] text-cream">
-      <span class="ember-glow -left-64 -top-72 h-[1000px] w-[1000px]" />
+    <!-- ===== full-bleed hero: the drum ===== -->
+    <section class="relative flex min-h-[480px] md:min-h-[560px] lg:min-h-[660px] flex-col justify-end overflow-hidden bg-espresso text-cream">
+      <img
+        v-if="heroImage"
+        :src="heroImage"
+        alt="Espresso running from the machine, side light"
+        class="absolute inset-0 h-full w-full object-cover"
+      >
+      <div class="absolute inset-0" style="background: linear-gradient(100deg, rgba(46,33,26,.96) 25%, rgba(46,33,26,.55) 55%, rgba(46,33,26,.25))" />
+      <div class="absolute inset-0" style="background: linear-gradient(0deg, rgba(46,33,26,.85), transparent 45%)" />
 
-      <div class="relative mx-auto grid max-w-[1440px] grid-cols-1 lg:grid-cols-[1.15fr_.85fr] gap-10 lg:gap-14 px-5 md:px-6 lg:px-14 pt-12 lg:pt-[78px]">
-        <div>
-          <p class="mono-label text-xs font-medium tracking-[0.18em] text-ember">
-            SMALL-BATCH ROASTERY · FREIBURG · EST. 2019
-          </p>
-          <h1 class="mt-6 font-display text-[42px] md:text-[58px] lg:text-[84px] font-semibold leading-[1.0] tracking-[-0.02em] text-cream">
-            Dark, sweet and&nbsp;still <em class="font-normal not-italic italic text-ember">warm</em> from the&nbsp;drum.
-          </h1>
-          <p class="mt-6 max-w-[42ch] text-[17px] leading-[1.7] text-[#EFE4D8]/72">
-            Twelve kilos a batch, roasted every Tuesday. Coffee, granola,
-            honey and the gear to brew it properly.
-          </p>
-          <div class="mt-8 flex flex-col sm:flex-row gap-3.5">
-            <NuxtLink to="/shop" class="btn-primary w-full sm:w-auto">Shop the roast</NuxtLink>
-            <a href="#" class="btn-ghost-dark w-full sm:w-auto">Taste guide</a>
-          </div>
-          <p class="mono-label mt-9 text-xs text-[#EFE4D8]/55">
-            {{ products.length }} PRODUCTS &nbsp;·&nbsp; SHIPS IN 48 H &nbsp;·&nbsp; ROASTED TO ORDER
-          </p>
-        </div>
+      <p class="mono-label absolute right-5 top-7 md:right-6 lg:right-14 lg:top-9 text-right text-[10px] lg:text-[11px] leading-[2] text-[#EFE4D8]/75">
+        BATCH № {{ batch.number }}<br>ROASTED {{ batch.roastedShort }}
+      </p>
 
-        <div class="relative h-[250px] md:h-[320px] lg:h-[470px] overflow-hidden rounded-[14px]" style="box-shadow: var(--shadow-hero)">
-          <img
-            v-if="heroImage"
-            :src="heroImage"
-            alt="Freshly roasted beans on dark steel, side light"
-            class="h-full w-full object-cover"
-          >
+      <div class="relative mx-auto w-full max-w-[1440px] px-5 md:px-6 lg:px-14 pb-12 md:pb-16 lg:pb-20 pt-32">
+        <p class="mono-label text-xs font-medium tracking-[0.18em] text-ember">
+          SMALL-BATCH ROASTERY · FREIBURG · EST. 2019
+        </p>
+        <h1 class="mt-5 max-w-[14ch] font-display text-[42px] md:text-[58px] lg:text-[80px] font-semibold leading-[1.02] tracking-[-0.02em] text-cream">
+          Dark, sweet and&nbsp;still <em class="font-normal italic text-ember">warm</em> from the&nbsp;drum.
+        </h1>
+        <div class="mt-8 lg:mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+          <NuxtLink to="/shop" class="btn-primary w-full sm:w-auto">Shop the roast</NuxtLink>
+          <a href="#" class="text-[15px] font-medium text-[#EFE4D8] border-b border-[#EFE4D8]/40 pb-0.5 self-center sm:self-auto transition-colors hover:text-ember hover:border-ember">
+            Taste guide
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- ===== featured products, overlapping the band ===== -->
-    <section class="relative mx-auto -mt-[62px] md:-mt-[80px] lg:-mt-[96px] max-w-[1440px] px-5 md:px-6 lg:px-14">
+    <!-- ===== featured products ===== -->
+    <section class="mx-auto max-w-[1440px] px-5 md:px-6 lg:px-14 pt-12 lg:pt-16">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-[22px]">
-        <ProductCard v-for="p in featured" :key="p.id" :product="p" on-dark />
+        <ProductCard v-for="p in featured" :key="p.id" :product="p" />
       </div>
       <div class="mt-5 text-right">
         <NuxtLink to="/shop" class="text-sm font-medium text-terra hover:text-terra-dark">

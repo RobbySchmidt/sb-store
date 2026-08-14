@@ -35,9 +35,8 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
         </button>
 
         <!-- logo -->
-        <NuxtLink to="/" class="flex items-center gap-2.5 lg:-ml-0 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-          <span class="h-2.5 w-2.5 rounded-full bg-terra shrink-0" />
-          <span class="font-display text-[20px] lg:text-[23px] font-semibold text-cream whitespace-nowrap">Ember &amp; Oak</span>
+        <NuxtLink to="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
+          <BrandMark :size="48" />
         </NuxtLink>
 
         <!-- desktop nav -->
