@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D4;font-family:Inter,sans-serif;color:#2E211A}a{color:#C65F3D;text-decoration:none}a:hover{color:#A94C2F}</style>
+</helmet>
+
+<section style="padding:40px 48px 44px;border-bottom:1px solid rgba(46,33,26,.1)" id="t1">
+  <div style="display:flex;align-items:baseline;gap:10px;margin:0 0 8px"><a href="#t1" style="font:600 10px IBM Plex Mono,monospace;padding:3px 7px;background:#2E211A;color:#fff;border-radius:4px">1</a><span style="font:600 13px Inter,sans-serif;color:#2E211A">Three homepage directions with more personality — the current version stays untouched in <a href="1 Homepage.dc.html" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1 Homepage</a></span></div>
+  <p style="font:13px/1.6 Inter,sans-serif;color:#7A6A5C;margin:0 0 26px;max-width:80ch">Same palette and sample data throughout; each direction changes the structure, type treatment and rhythm rather than the colors. Desktop 1440 shown — I'll build tablet and mobile for whichever you pick.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:9px" id="1a" data-screen-label="1a Roast ledger">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,sans-serif;color:rgba(46,33,26,.55)"><a href="#1a" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1a</a>Roast ledger — editorial, no cards, hairline rules, monospace batch data</div>
+      <div style="width:1440px;background:#FAF6EF;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <header style="display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:76px;border-bottom:1px solid #2E211A">
+          <span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;letter-spacing:-.01em">Ember <span style="color:#C65F3D">&amp;</span> Oak</span>
+          <nav style="display:flex;align-items:center;gap:34px;font:500 12px IBM Plex Mono,monospace;letter-spacing:.08em">
+            <a href="2 Shop.dc.html" style="color:#2E211A">SHOP</a><a href="#" style="color:#2E211A">ABOUT</a><a href="#" style="color:#2E211A">BREW GUIDES</a>
+            <span style="display:flex;align-items:center;gap:7px;border:1px solid #2E211A;padding:7px 13px">CART<span style="background:#C65F3D;color:#fff;padding:1px 6px">2</span></span>
+          </nav>
+        </header>
+        <section style="padding:60px 56px 44px;border-bottom:1px solid #E8DFD2">
+          <div style="display:flex;justify-content:space-between;font:500 11px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C;padding-bottom:22px"><span>BATCH № 214 · ROASTED TUE 12 AUG 2026</span><span>DRUM TEMP 214°C · 11 MIN 40 S</span><span>FREIBURG, DE</span></div>
+          <h2 style="font-family:Fraunces,serif;font-size:118px;line-height:.92;font-weight:600;margin:0;letter-spacing:-.03em">Every bag is<br>a dated<span style="color:#C65F3D">.</span> <em style="font-weight:400">batch</em></h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;padding-top:34px;align-items:end">
+            <p style="font:16px/1.65 Inter,sans-serif;color:#7A6A5C;margin:0">We roast twelve kilos at a time, write the date on the bag by hand, and ship it the next morning. No warehouse, no stale stock.</p>
+            <div style="font:13px/1.8 IBM Plex Mono,monospace;color:#7A6A5C">→ 6 coffees on the shelf<br>→ 11 pantry goods<br>→ Free EU shipping over €49</div>
+            <a href="2 Shop.dc.html" style="justify-self:end;background:#2E211A;color:#FAF6EF;padding:18px 30px;font:600 13px IBM Plex Mono,monospace;letter-spacing:.1em" style-hover="background:#C65F3D;color:#fff">SHOP THE ROAST →</a>
+          </div>
+        </section>
+        <section style="display:grid;grid-template-columns:repeat(4,1fr)">
+          <sc-for list="{{ strip }}" as="s" hint-placeholder-count="4">
+            <div style="height:230px;border-right:1px solid #E8DFD2;background:repeating-linear-gradient(45deg,#F0E7D8 0 13px,#E9DECB 13px 26px);display:flex;align-items:flex-end;padding:18px"><span style="font:10px IBM Plex Mono,monospace;color:#8A7A6A;background:rgba(255,255,255,.8);padding:3px 7px">{{ s }}</span></div>
+          </sc-for>
+        </section>
+        <section style="padding:56px 56px 24px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid #2E211A;padding-bottom:12px">
+            <h3 style="font-family:Fraunces,serif;font-size:30px;font-weight:600;margin:0">On the shelf this week</h3>
+            <span style="font:500 11px IBM Plex Mono,monospace;letter-spacing:.1em;color:#7A6A5C">4 OF 12 SHOWN · ALL PRICES INCL. VAT</span>
+          </div>
+          <sc-for list="{{ ledger }}" as="p" hint-placeholder-count="4">
+            <a href="3 Product Detail.dc.html" style="display:grid;grid-template-columns:56px 92px 1.7fr 1.3fr 130px 150px;gap:24px;align-items:center;padding:20px 0;border-bottom:1px solid #E8DFD2;color:#2E211A" style-hover="background:#F5EEE1;color:#2E211A">
+              <span style="font:500 12px IBM Plex Mono,monospace;color:#7A6A5C">{{ p.no }}</span>
+              <span style="height:64px;background:repeating-linear-gradient(45deg,#F0E7D8 0 9px,#E9DECB 9px 18px)"></span>
+              <span style="display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:22px;font-weight:600">{{ p.name }}</span><span style="font:13px Inter,sans-serif;color:#7A6A5C">{{ p.tag }}</span></span>
+              <span style="font:11px IBM Plex Mono,monospace;letter-spacing:.08em;color:#7A6A5C">{{ p.meta }}</span>
+              <span style="font:600 20px Inter,sans-serif;text-align:right">{{ p.price }}</span>
+              <button style="border:1px solid #2E211A;background:none;color:#2E211A;padding:13px 0;font:600 11px IBM Plex Mono,monospace;letter-spacing:.1em;cursor:pointer" style-hover="background:#C65F3D;border-color:#C65F3D;color:#fff">ADD TO CART</button>
+            </a>
+          </sc-for>
+        </section>
+        <footer style="background:#4A3428;color:#EFE4D8;margin-top:40px;padding:48px 56px;display:flex;align-items:flex-end;justify-content:space-between">
+          <span style="font-family:Fraunces,serif;font-size:44px;font-weight:600;line-height:1;max-width:20ch">Roasted Tuesdays.<br>Shipped Wednesdays.</span>
+          <div style="display:flex;gap:56px;font:13px/2 Inter,sans-serif">
+            <div style="display:flex;flex-direction:column"><span style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:rgba(239,228,216,.5)">SHOP</span><a href="2 Shop.dc.html" style="color:#EFE4D8">Coffee</a><a href="2 Shop.dc.html" style="color:#EFE4D8">Pantry</a><a href="2 Shop.dc.html" style="color:#EFE4D8">Accessories</a></div>
+            <div style="display:flex;flex-direction:column"><span style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:rgba(239,228,216,.5)">HOUSE</span><a href="#" style="color:#EFE4D8">Our story</a><a href="#" style="color:#EFE4D8">Wholesale</a><a href="#" style="color:#EFE4D8">Contact</a></div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:9px" id="1b" data-screen-label="1b Ember dark">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,sans-serif;color:rgba(46,33,26,.55)"><a href="#1b" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1b</a>Ember dark — full-bleed dark hero, glow, cream cards spilling over the edge</div>
+      <div style="width:1440px;background:#FAF6EF;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <div style="position:relative;background:#2E211A;padding:0 0 130px;overflow:hidden">
+          <div style="position:absolute;width:900px;height:900px;border-radius:50%;left:-180px;top:-320px;background:radial-gradient(circle,rgba(198,95,61,.42),rgba(198,95,61,0) 68%)"></div>
+          <header style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:84px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span>
+            <nav style="display:flex;align-items:center;gap:32px;font:500 14px Inter,sans-serif">
+              <a href="2 Shop.dc.html" style="color:#EFE4D8">Shop</a><a href="#" style="color:#EFE4D8">About</a>
+              <span style="display:flex;align-items:center;gap:8px;border:1px solid rgba(239,228,216,.32);border-radius:999px;padding:9px 17px;color:#FAF6EF">Cart<span style="background:#C65F3D;color:#fff;min-width:20px;height:20px;border-radius:999px;font:700 11px Inter,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 5px">2</span></span>
+            </nav>
+          </header>
+          <div style="position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;padding:78px 56px 0;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:26px;align-items:flex-start">
+              <span style="font:500 12px IBM Plex Mono,monospace;letter-spacing:.18em;color:#E4A07F">SMALL-BATCH ROASTERY · FREIBURG</span>
+              <h2 style="font-family:Fraunces,serif;font-size:84px;line-height:1.0;font-weight:600;margin:0;color:#FAF6EF;letter-spacing:-.02em">Dark, sweet<br>and still<br><span style="color:#E4A07F;font-style:italic;font-weight:400">warm</span> from the drum.</h2>
+              <p style="font:17px/1.7 Inter,sans-serif;color:rgba(239,228,216,.72);margin:0;max-width:42ch">Twelve kilos a batch, roasted every Tuesday. Coffee, granola, honey and the gear to brew it properly.</p>
+              <div style="display:flex;gap:14px;align-items:center">
+                <a href="2 Shop.dc.html" style="background:#C65F3D;color:#fff;border-radius:999px;padding:17px 32px;font:600 15px Inter,sans-serif" style-hover="background:#A94C2F;color:#fff">Shop the roast</a>
+                <a href="#" style="border:1px solid rgba(239,228,216,.35);border-radius:999px;padding:16px 28px;font:600 15px Inter,sans-serif;color:#EFE4D8" style-hover="border-color:#E4A07F;color:#E4A07F">Taste guide</a>
+              </div>
+            </div>
+            <div style="height:470px;border-radius:14px;background:repeating-linear-gradient(45deg,#3B2A21 0 15px,#463227 15px 30px);display:flex;align-items:center;justify-content:center;box-shadow:0 30px 70px rgba(0,0,0,.4)"><span style="font:11px IBM Plex Mono,monospace;color:#C9B8A8;background:rgba(46,33,26,.7);padding:5px 10px;border-radius:5px">hero photo — beans on dark steel, side light</span></div>
+          </div>
+        </div>
+        <section style="padding:0 56px;margin-top:-96px;position:relative">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+            <sc-for list="{{ cards }}" as="p" hint-placeholder-count="4">
+              <div style="background:#FFFFFF;border-radius:14px;overflow:hidden;box-shadow:0 18px 44px rgba(46,33,26,.16);display:flex;flex-direction:column;transition:transform .2s" style-hover="transform:translateY(-6px)">
+                <div style="aspect-ratio:1/1;background:repeating-linear-gradient(45deg,#F0E7D8 0 12px,#E9DECB 12px 24px);display:flex;align-items:flex-start;justify-content:space-between;padding:14px">
+                  <span style="background:#2E211A;color:#FAF6EF;border-radius:999px;padding:4px 10px;font:600 10px IBM Plex Mono,monospace;letter-spacing:.08em">{{ p.badge }}</span>
+                  <span style="font:9px IBM Plex Mono,monospace;color:#8A7A6A;background:rgba(255,255,255,.8);padding:3px 6px;border-radius:4px;align-self:flex-end">{{ p.ph }}</span>
+                </div>
+                <div style="padding:20px;display:flex;flex-direction:column;gap:7px;flex:1">
+                  <span style="font-family:Fraunces,serif;font-size:18px;font-weight:600;line-height:1.25">{{ p.name }}</span>
+                  <span style="font:13px/1.5 Inter,sans-serif;color:#7A6A5C;flex:1">{{ p.tag }}</span>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px"><span style="font:600 17px Inter,sans-serif">{{ p.price }}</span><button style="width:42px;height:42px;border-radius:999px;background:#2E211A;color:#fff;border:none;font-size:19px;cursor:pointer" style-hover="background:#C65F3D">+</button></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+        <section style="padding:72px 56px 80px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
+            <a href="2 Shop.dc.html" style="position:relative;height:260px;border-radius:14px;overflow:hidden;background:repeating-linear-gradient(45deg,#EDE2CF 0 14px,#E5D8C1 14px 28px);display:flex;align-items:flex-end;padding:26px" style-hover="opacity:.94">
+              <span style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(46,33,26,.68))"></span>
+              <span style="position:relative;display:flex;flex-direction:column;gap:3px"><span style="font-family:Fraunces,serif;font-size:30px;font-weight:600;color:#fff">{{ c.name }}</span><span style="font:13px Inter,sans-serif;color:rgba(255,255,255,.82)">{{ c.count }} →</span></span>
+            </a>
+          </sc-for>
+        </section>
+        <footer style="background:#2E211A;color:#EFE4D8;padding:52px 56px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:Fraunces,serif;font-size:26px;font-weight:600">Ember &amp; Oak</span>
+          <div style="display:flex;gap:34px;font:14px Inter,sans-serif"><a href="2 Shop.dc.html" style="color:#EFE4D8">Coffee</a><a href="2 Shop.dc.html" style="color:#EFE4D8">Pantry</a><a href="2 Shop.dc.html" style="color:#EFE4D8">Accessories</a><a href="#" style="color:#EFE4D8">Our story</a><a href="#" style="color:#EFE4D8">Contact</a></div>
+          <span style="font:12px IBM Plex Mono,monospace;color:rgba(239,228,216,.5)">© 2026 · FREE EU SHIPPING OVER €49</span>
+        </footer>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:9px" id="1c" data-screen-label="1c Paper labels">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,sans-serif;color:rgba(46,33,26,.55)"><a href="#1c" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1c</a>Paper labels — stamped tags, tilted stickers, mosaic grid, playful scale</div>
+      <div style="width:1440px;background:#F3ECDE;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <header style="display:flex;align-items:center;justify-content:space-between;padding:22px 48px;background:#FAF6EF;border-bottom:2px dashed #D9CBB4">
+          <span style="display:flex;align-items:center;gap:12px"><span style="width:38px;height:38px;border-radius:50%;background:#C65F3D;color:#fff;font-family:Fraunces,serif;font-size:19px;font-weight:700;display:flex;align-items:center;justify-content:center">E</span><span style="font-family:Fraunces,serif;font-size:22px;font-weight:700;letter-spacing:-.01em">Ember &amp; Oak</span></span>
+          <nav style="display:flex;align-items:center;gap:10px">
+            <a href="2 Shop.dc.html" style="background:#FFFFFF;border:1.5px solid #2E211A;border-radius:999px;padding:9px 18px;font:600 13px Inter,sans-serif;color:#2E211A" style-hover="background:#2E211A;color:#FAF6EF">Shop</a>
+            <a href="#" style="background:#FFFFFF;border:1.5px solid #2E211A;border-radius:999px;padding:9px 18px;font:600 13px Inter,sans-serif;color:#2E211A" style-hover="background:#2E211A;color:#FAF6EF">About</a>
+            <span style="display:flex;align-items:center;gap:8px;background:#2E211A;border-radius:999px;padding:10px 18px;font:600 13px Inter,sans-serif;color:#FAF6EF">Cart<span style="background:#C65F3D;min-width:20px;height:20px;border-radius:999px;font:700 11px Inter,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 5px">2</span></span>
+          </nav>
+        </header>
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:2px dashed #D9CBB4">
+          <div style="padding:64px 48px;display:flex;flex-direction:column;gap:22px;align-items:flex-start">
+            <span style="transform:rotate(-2.5deg);background:#D99A2B;color:#2E211A;padding:6px 14px;font:700 12px IBM Plex Mono,monospace;letter-spacing:.1em;box-shadow:2px 2px 0 #2E211A">FRESH BATCH · TUE 12 AUG</span>
+            <h2 style="font-family:Fraunces,serif;font-size:76px;line-height:1.02;font-weight:700;margin:0;letter-spacing:-.02em">Good coffee,<br>honest jars,<br><span style="background:#C65F3D;color:#FAF6EF;padding:0 12px;display:inline-block;transform:rotate(-1deg)">nothing fancy.</span></h2>
+            <p style="font:17px/1.65 Inter,sans-serif;color:#7A6A5C;margin:0;max-width:40ch">Roasted, jarred and labelled by four people in an old tannery. Everything ships within 48 hours.</p>
+            <a href="2 Shop.dc.html" style="background:#2E211A;color:#FAF6EF;border-radius:999px;padding:17px 32px;font:700 15px Inter,sans-serif;box-shadow:4px 4px 0 #C65F3D" style-hover="background:#C65F3D;color:#fff">Shop the roast →</a>
+          </div>
+          <div style="position:relative;background:repeating-linear-gradient(45deg,#EDE2CF 0 15px,#E5D8C1 15px 30px);min-height:520px;display:flex;align-items:center;justify-content:center">
+            <span style="font:11px IBM Plex Mono,monospace;color:#8A7A6A;background:rgba(255,255,255,.82);padding:5px 10px">hero photo — hands stamping bag labels</span>
+            <span style="position:absolute;bottom:38px;left:-34px;transform:rotate(-4deg);background:#FAF6EF;border:1.5px solid #2E211A;padding:14px 20px;font:600 13px Inter,sans-serif;box-shadow:4px 4px 0 rgba(46,33,26,.18)">Hand-labelled · batch № 214</span>
+          </div>
+        </section>
+        <section style="padding:48px 48px 20px;display:flex;align-items:baseline;justify-content:space-between">
+          <h3 style="font-family:Fraunces,serif;font-size:34px;font-weight:700;margin:0">Pick of the shelf</h3>
+          <a href="2 Shop.dc.html" style="font:600 14px Inter,sans-serif">All 12 products →</a>
+        </section>
+        <section style="padding:0 48px 56px;display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:auto auto;gap:20px">
+          <div style="grid-row:span 2;background:#FAF6EF;border:1.5px solid #2E211A;border-radius:14px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="flex:1;min-height:300px;background:repeating-linear-gradient(45deg,#F0E7D8 0 13px,#E9DECB 13px 26px);position:relative;display:flex;align-items:center;justify-content:center">
+              <span style="font:10px IBM Plex Mono,monospace;color:#8A7A6A;background:rgba(255,255,255,.8);padding:3px 7px">coffee bag — dark roast</span>
+              <span style="position:absolute;top:16px;left:16px;transform:rotate(-3deg);background:#C65F3D;color:#fff;padding:5px 12px;font:700 11px IBM Plex Mono,monospace;letter-spacing:.08em">HOUSE FAVOURITE</span>
+            </div>
+            <div style="padding:24px;display:flex;flex-direction:column;gap:8px;border-top:1.5px solid #2E211A">
+              <span style="font-family:Fraunces,serif;font-size:26px;font-weight:700;line-height:1.2">Ember Blend – Dark Roast 250g</span>
+              <span style="font:14px/1.55 Inter,sans-serif;color:#7A6A5C">Cocoa, burnt sugar, a whisper of smoke. Our everyday drum roast — forgiving in any brewer.</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font:700 24px Inter,sans-serif">€14.90</span><button style="background:#2E211A;color:#FAF6EF;border:none;border-radius:999px;padding:14px 24px;font:700 14px Inter,sans-serif;cursor:pointer;box-shadow:3px 3px 0 #C65F3D" style-hover="background:#C65F3D">Add to cart</button></div>
+            </div>
+          </div>
+          <sc-for list="{{ tiles }}" as="p" hint-placeholder-count="4">
+            <div style="background:#FAF6EF;border:1.5px solid #2E211A;border-radius:14px;overflow:hidden;display:flex;flex-direction:column">
+              <div style="height:150px;background:repeating-linear-gradient(45deg,#F0E7D8 0 11px,#E9DECB 11px 22px);display:flex;align-items:center;justify-content:center"><span style="font:9px IBM Plex Mono,monospace;color:#8A7A6A;background:rgba(255,255,255,.8);padding:3px 6px">{{ p.ph }}</span></div>
+              <div style="padding:16px;display:flex;flex-direction:column;gap:5px;border-top:1.5px solid #2E211A;flex:1">
+                <span style="font-family:Fraunces,serif;font-size:16px;font-weight:700;line-height:1.25;flex:1">{{ p.name }}</span>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:700 16px Inter,sans-serif">{{ p.price }}</span><button style="background:none;border:1.5px solid #2E211A;border-radius:999px;padding:9px 14px;font:700 12px Inter,sans-serif;cursor:pointer;color:#2E211A" style-hover="background:#C65F3D;border-color:#C65F3D;color:#fff">Add</button></div>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+        <footer style="background:#4A3428;color:#EFE4D8;padding:44px 48px;display:flex;align-items:center;justify-content:space-between;border-top:2px dashed #D9CBB4">
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:32px;height:32px;border-radius:50%;background:#C65F3D;color:#fff;font-family:Fraunces,serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">E</span><span style="font-family:Fraunces,serif;font-size:22px;font-weight:700">Ember &amp; Oak</span></div>
+          <div style="display:flex;gap:12px">
+            <a href="2 Shop.dc.html" style="border:1.5px solid rgba(239,228,216,.4);border-radius:999px;padding:9px 17px;font:600 13px Inter,sans-serif;color:#EFE4D8" style-hover="background:#EFE4D8;color:#2E211A">Coffee</a>
+            <a href="2 Shop.dc.html" style="border:1.5px solid rgba(239,228,216,.4);border-radius:999px;padding:9px 17px;font:600 13px Inter,sans-serif;color:#EFE4D8" style-hover="background:#EFE4D8;color:#2E211A">Pantry</a>
+            <a href="2 Shop.dc.html" style="border:1.5px solid rgba(239,228,216,.4);border-radius:999px;padding:9px 17px;font:600 13px Inter,sans-serif;color:#EFE4D8" style-hover="background:#EFE4D8;color:#2E211A">Accessories</a>
+            <a href="#" style="border:1.5px solid rgba(239,228,216,.4);border-radius:999px;padding:9px 17px;font:600 13px Inter,sans-serif;color:#EFE4D8" style-hover="background:#EFE4D8;color:#2E211A">Our story</a>
+          </div>
+          <span style="font:11px IBM Plex Mono,monospace;color:rgba(239,228,216,.5)">© 2026 EMBER &amp; OAK ROASTERY GMBH</span>
+        </footer>
+      </div>
+    </div>
+
+  </div>
+  <p style="margin:22px 0 0;font:12px/1.5 Inter,sans-serif;color:rgba(46,33,26,.5)">Try next: "build <a href="#1b" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1b</a> at tablet and mobile too" · "<a href="#1a" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1a</a>'s ledger list inside <a href="#1c" style="font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(46,33,26,.08);color:#2E211A;border-radius:5px">1c</a>" · "roll the winner across all 7 pages"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const ledger = [
+      {no:"01", name:"Ember Blend – Dark Roast", tag:"Cocoa, burnt sugar, a whisper of smoke", meta:"250G · DRUM 11:40", price:"€14.90"},
+      {no:"02", name:"Sunrise Single Origin – Ethiopia", tag:"Jasmine, bergamot, sweet citrus", meta:"250G · WASHED", price:"€16.50"},
+      {no:"03", name:"Honey Almond Granola", tag:"Slow-baked with wildflower honey", meta:"500G JAR", price:"€8.50"},
+      {no:"04", name:"Ceramic Pour-Over Dripper", tag:"Hand-glazed stoneware, 1–2 cups", meta:"1–2 CUPS", price:"€24.00"}
+    ];
+    const cards = [
+      {name:"Ember Blend – Dark Roast", tag:"Cocoa, burnt sugar, smoke", price:"€14.90", badge:"NEW BATCH", ph:"dark roast bag"},
+      {name:"Sunrise – Ethiopia", tag:"Jasmine, bergamot, citrus", price:"€16.50", badge:"LIGHT", ph:"light roast bag"},
+      {name:"Honey Almond Granola", tag:"Slow-baked, wildflower honey", price:"€8.50", badge:"PANTRY", ph:"granola jar"},
+      {name:"Ceramic Pour-Over Dripper", tag:"Hand-glazed stoneware", price:"€24.00", badge:"GEAR", ph:"ceramic dripper"}
+    ];
+    const tiles = [
+      {name:"Sunrise – Ethiopia 250g", price:"€16.50", ph:"light roast bag"},
+      {name:"Honey Almond Granola 500g", price:"€8.50", ph:"granola jar"},
+      {name:"70% Dark Cacao Bar", price:"€6.90", ph:"chocolate bar"},
+      {name:"Ceramic Pour-Over Dripper", price:"€24.00", ph:"ceramic dripper"}
+    ];
+    const cats = [
+      {name:"Coffee", count:"6 products"},
+      {name:"Pantry", count:"5 products"},
+      {name:"Accessories", count:"4 products"}
+    ];
+    return { ledger, cards, tiles, cats, strip:["roasting drum","bagging table","honey shelf","brew bar"] };
+  }
+}
+</script>
+</body>
+</html>

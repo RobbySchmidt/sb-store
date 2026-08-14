@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D4;font-family:Inter,sans-serif;color:#2E211A}a{color:#C65F3D;text-decoration:none}a:hover{color:#A94C2F}</style>
+</helmet>
+<div style="padding:40px 48px 80px;display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">EMBER &amp; OAK · PAGE 7 OF 7 · EMBER DARK</div>
+    <h1 style="font-family:Fraunces,serif;font-size:30px;font-weight:600;margin:0">Admin orders dashboard — /admin</h1>
+    <p style="font-size:13px;line-height:1.6;color:#7A6A5C;margin:0">Internal tool: dark espresso topbar with live counters, dense cream table below. Status = amber (open), green (marked), red (canceled). Row 1 expanded. Tablet/mobile collapse to order cards with the same actions.</p>
+    <div style="display:flex;gap:16px;font-size:12px;font-weight:500;flex-wrap:wrap"><a href="5 Checkout.dc.html">← Checkout</a><a href="1 Homepage Ember Dark.dc.html">Homepage →</a></div>
+  </div>
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Admin · Desktop 1440">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">DESKTOP · 1440 (ROW 1 EXPANDED)</div>
+      <div style="width:1440px;background:#F6F2EA;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <div style="background:#2E211A;padding-bottom:52px">
+          <header style="display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:18px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span></span>
+              <span style="color:rgba(239,228,216,.3)">/</span><span style="font:600 14px Inter,sans-serif;color:#FAF6EF">Orders</span>
+              <span style="border:1px solid rgba(239,228,216,.28);border-radius:999px;padding:3px 10px;font:600 10px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.7)">INTERNAL</span>
+            </div>
+            <span style="font:11px IBM Plex Mono,monospace;letter-spacing:.08em;color:rgba(239,228,216,.6)">THU 14 AUG 2026 · 8 ORDERS THIS WEEK</span>
+          </header>
+          <div style="padding:24px 32px 0;display:flex;align-items:center;gap:40px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:28px;font-weight:600;color:#FAF6EF">{{ s.v }}</span><span style="font:10px IBM Plex Mono,monospace;letter-spacing:.12em;color:rgba(239,228,216,.55)">{{ s.k }}</span></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:0 32px 64px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;background:#FFFFFF;border-radius:14px;box-shadow:0 14px 34px rgba(46,33,26,.12);padding:12px 16px;margin-top:-32px;position:relative">
+            <div style="display:flex;gap:6px">
+              <button style="background:#2E211A;color:#FAF6EF;border:none;border-radius:999px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer">All <span style="opacity:.55">8</span></button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer" style-hover="color:#2E211A;border-color:#D99A2B">Open <span style="color:#D99A2B;font-weight:700">3</span></button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer" style-hover="color:#2E211A;border-color:#5C8A5C">Marked <span style="color:#5C8A5C;font-weight:700">3</span></button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer" style-hover="color:#2E211A;border-color:#B0483B">Canceled <span style="color:#B0483B;font-weight:700">2</span></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:#FAF6EF;border:1px solid #E8DFD2;border-radius:999px;padding:0 16px;height:42px;width:330px">
+              <span style="width:12px;height:12px;border:2px solid #7A6A5C;border-radius:50%;position:relative;flex:none"><span style="position:absolute;width:2px;height:6px;background:#7A6A5C;transform:rotate(-45deg);left:11px;top:9px"></span></span>
+              <span style="font-size:13px;color:#7A6A5C">Search customer or order №…</span>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 14px 34px rgba(46,33,26,.1);overflow:hidden">
+            <div style="display:grid;grid-template-columns:130px 92px 1.2fr 1.5fr 64px 90px 118px 220px;gap:16px;padding:13px 20px;border-bottom:1px solid #E8DFD2;background:#FAF6EF;font:600 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C">
+              <span>ORDER</span><span>DATE</span><span>CUSTOMER</span><span>EMAIL</span><span>ITEMS</span><span style="text-align:right">TOTAL</span><span>STATUS</span><span>SET STATUS</span>
+            </div>
+            <div style="border-bottom:1px solid #E8DFD2;background:#FDFBF7">
+              <div style="display:grid;grid-template-columns:130px 92px 1.2fr 1.5fr 64px 90px 118px 220px;gap:16px;padding:14px 20px;align-items:center;font-size:13px">
+                <span style="font:600 12px IBM Plex Mono,monospace;display:flex;align-items:center;gap:8px"><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #7A6A5C"></span>#0847</span>
+                <span style="color:#7A6A5C">Aug 14</span><span style="font-weight:600">Lena Hoffmann</span><span style="color:#7A6A5C">lena.hoffmann@example.com</span><span>3</span><span style="text-align:right;font-weight:600">€56.40</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#FBF1DC;color:#9A6E14;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;justify-self:start"><span style="width:7px;height:7px;border-radius:50%;background:#D99A2B"></span>Open</span>
+                <span style="display:flex;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden;justify-self:start">
+                  <button style="background:#D99A2B;color:#fff;border:none;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer">Open</button>
+                  <button style="background:#fff;color:#7A6A5C;border:none;border-left:1px solid #E8DFD2;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:500;cursor:pointer" style-hover="color:#5C8A5C">Marked</button>
+                  <button style="background:#fff;color:#7A6A5C;border:none;border-left:1px solid #E8DFD2;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:500;cursor:pointer" style-hover="color:#B0483B">Cancel</button>
+                </span>
+              </div>
+              <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:28px;padding:6px 20px 22px 56px">
+                <div style="background:#FAF6EF;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:10px">
+                  <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C">LINE ITEMS</span>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>Ember Blend – Dark Roast 250g × 1</span><span style="font-weight:600">€14.90</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>Sunrise Single Origin – Ethiopia 250g × 2</span><span style="font-weight:600">€33.00</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>Honey Almond Granola 500g × 1</span><span style="font-weight:600">€8.50</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;border-top:1px solid #E8DFD2;padding-top:9px"><span style="color:#7A6A5C">Shipping</span><span style="font-weight:600;color:#5C8A5C">Free</span></div>
+                </div>
+                <div style="background:#FAF6EF;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:6px">
+                  <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C">SHIPPING ADDRESS</span>
+                  <span style="font-size:13px;line-height:1.6">Lena Hoffmann<br>Lindenstraße 24<br>79098 Freiburg, Germany</span>
+                </div>
+              </div>
+            </div>
+            <sc-for list="{{ orders }}" as="o" hint-placeholder-count="7">
+              <div style="display:grid;grid-template-columns:130px 92px 1.2fr 1.5fr 64px 90px 118px 220px;gap:16px;padding:14px 20px;align-items:center;font-size:13px;border-bottom:1px solid #F0EAE0" style-hover="background:#FDFBF7">
+                <span style="font:600 12px IBM Plex Mono,monospace;display:flex;align-items:center;gap:8px"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:6px solid #C9BCAB"></span>{{ o.num }}</span>
+                <span style="color:#7A6A5C">{{ o.date }}</span><span style="font-weight:600">{{ o.customer }}</span><span style="color:#7A6A5C">{{ o.email }}</span><span>{{ o.items }}</span><span style="text-align:right;font-weight:600">{{ o.total }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;justify-self:start;background:{{ o.bbg }};color:{{ o.bfg }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ o.dot }}"></span>{{ o.status }}</span>
+                <span style="display:flex;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden;justify-self:start">
+                  <button style="border:none;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.obg }};color:{{ o.ofg }}">Open</button>
+                  <button style="border:none;border-left:1px solid #E8DFD2;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.mbg }};color:{{ o.mfg }}">Marked</button>
+                  <button style="border:none;border-left:1px solid #E8DFD2;padding:7px 13px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.cbg }};color:{{ o.cfg }}">Cancel</button>
+                </span>
+              </div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;font:11px IBM Plex Mono,monospace;letter-spacing:.08em;color:#7A6A5C"><span>SHOWING 8 OF 8 ORDERS</span><span style="display:flex;gap:6px"><span style="width:32px;height:32px;border:1px solid #E8DFD2;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#fff">←</span><span style="width:32px;height:32px;border:1px solid #E8DFD2;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#fff">→</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Admin · Tablet 768">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">TABLET · 768 (STACKED ORDER CARDS)</div>
+      <div style="width:768px;background:#F6F2EA;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <div style="background:#2E211A;padding-bottom:44px">
+          <header style="display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="display:flex;align-items:center;gap:10px"><span style="width:9px;height:9px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:17px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span><span style="color:rgba(239,228,216,.3)">/</span><span style="font:600 13px Inter,sans-serif;color:#FAF6EF">Orders</span></span>
+            <span style="border:1px solid rgba(239,228,216,.28);border-radius:999px;padding:3px 9px;font:600 9px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.7)">INTERNAL</span>
+          </header>
+          <div style="padding:18px 24px 0;display:flex;align-items:center;gap:30px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:22px;font-weight:600;color:#FAF6EF">{{ s.v }}</span><span style="font:9px IBM Plex Mono,monospace;letter-spacing:.12em;color:rgba(239,228,216,.55)">{{ s.k }}</span></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:0 24px 48px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 14px 34px rgba(46,33,26,.12);padding:12px;display:flex;flex-direction:column;gap:10px;margin-top:-28px;position:relative">
+            <div style="display:flex;align-items:center;gap:10px;background:#FAF6EF;border:1px solid #E8DFD2;border-radius:999px;padding:0 16px;height:44px"><span style="font-size:13px;color:#7A6A5C">Search customer or order №…</span></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button style="background:#2E211A;color:#FAF6EF;border:none;border-radius:999px;min-height:44px;padding:0 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer">All 8</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:44px;padding:0 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Open 3</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:44px;padding:0 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Marked 3</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:44px;padding:0 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Canceled 2</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <sc-for list="{{ cards }}" as="o" hint-placeholder-count="6">
+              <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 12px 28px rgba(46,33,26,.1);padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font:600 13px IBM Plex Mono,monospace">{{ o.num }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600;background:{{ o.bbg }};color:{{ o.bfg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ o.dot }}"></span>{{ o.status }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 14px Inter,sans-serif">{{ o.customer }}</span><span style="font-size:12px;color:#7A6A5C">{{ o.email }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#7A6A5C"><span>{{ o.date }} · {{ o.items }} items</span><span style="font-weight:600;color:#2E211A;font-size:13px">{{ o.total }}</span></div>
+                <div style="display:flex;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden">
+                  <button style="flex:1;border:none;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.obg }};color:{{ o.ofg }}">Open</button>
+                  <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.mbg }};color:{{ o.mfg }}">Marked</button>
+                  <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.cbg }};color:{{ o.cfg }}">Cancel</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Admin · Mobile 390">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">MOBILE · 390 (CARD 1 EXPANDED)</div>
+      <div style="width:390px;background:#F6F2EA;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <div style="background:#2E211A;padding-bottom:36px">
+          <header style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:16px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span><span style="color:rgba(239,228,216,.3)">/</span><span style="font:600 12px Inter,sans-serif;color:#FAF6EF">Orders</span></span>
+            <span style="border:1px solid rgba(239,228,216,.28);border-radius:999px;padding:2px 8px;font:600 8px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.7)">INTERNAL</span>
+          </header>
+          <div style="padding:16px 16px 0;display:flex;justify-content:space-between">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <span style="display:flex;flex-direction:column;gap:1px"><span style="font-family:Fraunces,serif;font-size:19px;font-weight:600;color:#FAF6EF">{{ s.v }}</span><span style="font:8px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.55)">{{ s.k }}</span></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:0 16px 40px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 12px 30px rgba(46,33,26,.12);padding:12px;display:flex;flex-direction:column;gap:10px;margin-top:-24px;position:relative">
+            <div style="display:flex;align-items:center;gap:10px;background:#FAF6EF;border:1px solid #E8DFD2;border-radius:999px;padding:0 16px;height:44px"><span style="font-size:13px;color:#7A6A5C">Search…</span></div>
+            <div style="display:flex;gap:6px;overflow:hidden">
+              <button style="background:#2E211A;color:#FAF6EF;border:none;border-radius:999px;min-height:40px;padding:0 14px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex:none">All 8</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:40px;padding:0 14px;font-family:Inter,sans-serif;font-size:12px;font-weight:500;cursor:pointer;flex:none">Open 3</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:40px;padding:0 14px;font-family:Inter,sans-serif;font-size:12px;font-weight:500;cursor:pointer;flex:none">Marked 3</button>
+              <button style="background:none;color:#7A6A5C;border:1px solid #E8DFD2;border-radius:999px;min-height:40px;padding:0 14px;font-family:Inter,sans-serif;font-size:12px;font-weight:500;cursor:pointer;flex:none">Canceled 2</button>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 12px 28px rgba(46,33,26,.1);padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font:600 13px IBM Plex Mono,monospace">#0847</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;background:#FBF1DC;color:#9A6E14;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:#D99A2B"></span>Open</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 14px Inter,sans-serif">Lena Hoffmann</span><span style="font-size:12px;color:#7A6A5C">lena.hoffmann@example.com</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#7A6A5C"><span>Aug 14 · 3 items</span><span style="font-weight:600;color:#2E211A;font-size:13px">€56.40</span></div>
+            <div style="background:#FAF6EF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+              <span style="font:600 9px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C">LINE ITEMS</span>
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span>Ember Blend – Dark 250g × 1</span><span style="font-weight:600">€14.90</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span>Sunrise – Ethiopia 250g × 2</span><span style="font-weight:600">€33.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span>Honey Almond Granola × 1</span><span style="font-weight:600">€8.50</span></div>
+              <span style="font:600 9px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C;margin-top:4px">SHIPS TO</span>
+              <span style="font-size:12px;line-height:1.5">Lindenstraße 24, 79098 Freiburg, DE</span>
+            </div>
+            <div style="display:flex;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden">
+              <button style="flex:1;border:none;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:#D99A2B;color:#fff">Open</button>
+              <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:#7A6A5C">Marked</button>
+              <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:#7A6A5C">Cancel</button>
+            </div>
+          </div>
+          <sc-for list="{{ mobileCards }}" as="o" hint-placeholder-count="3">
+            <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 10px 24px rgba(46,33,26,.1);padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font:600 13px IBM Plex Mono,monospace">{{ o.num }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600;background:{{ o.bbg }};color:{{ o.bfg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ o.dot }}"></span>{{ o.status }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 14px Inter,sans-serif">{{ o.customer }}</span><span style="font-size:12px;color:#7A6A5C">{{ o.email }}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#7A6A5C"><span>{{ o.date }} · {{ o.items }} items</span><span style="font-weight:600;color:#2E211A;font-size:13px">{{ o.total }}</span></div>
+              <div style="display:flex;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden">
+                <button style="flex:1;border:none;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.obg }};color:{{ o.ofg }}">Open</button>
+                <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.mbg }};color:{{ o.mfg }}">Marked</button>
+                <button style="flex:1;border:none;border-left:1px solid #E8DFD2;min-height:44px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.cbg }};color:{{ o.cfg }}">Cancel</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const S = {
+      open:    {status:"Open",     bbg:"#FBF1DC", bfg:"#9A6E14", dot:"#D99A2B"},
+      marked:  {status:"Marked",   bbg:"#E9F2E9", bfg:"#43703F", dot:"#5C8A5C"},
+      canceled:{status:"Canceled", bbg:"#F7E4E1", bfg:"#94382C", dot:"#B0483B"}
+    };
+    const seg = (st) => ({
+      obg: st==="open"     ? "#D99A2B" : "#FFFFFF", ofg: st==="open"     ? "#FFFFFF" : "#7A6A5C",
+      mbg: st==="marked"   ? "#5C8A5C" : "#FFFFFF", mfg: st==="marked"   ? "#FFFFFF" : "#7A6A5C",
+      cbg: st==="canceled" ? "#B0483B" : "#FFFFFF", cfg: st==="canceled" ? "#FFFFFF" : "#7A6A5C"
+    });
+    const mk = (num, date, customer, email, items, total, st) =>
+      Object.assign({num, date, customer, email, items, total}, S[st], seg(st));
+    const rows = [
+      mk("#0846","Aug 14","Jonas Weber","jonas.weber@mail.de","2","€36.30","open"),
+      mk("#0845","Aug 13","Marie Keller","m.keller@web.de","1","€24.00","marked"),
+      mk("#0844","Aug 13","Tom Richter","tom.richter@gmx.de","5","€71.20","marked"),
+      mk("#0843","Aug 12","Anna Schulz","anna.schulz@mail.de","2","€23.40","canceled"),
+      mk("#0842","Aug 12","David Braun","d.braun@posteo.de","3","€41.90","open"),
+      mk("#0841","Aug 11","Sofia Lang","sofia.lang@web.de","1","€14.90","marked"),
+      mk("#0840","Aug 11","Felix Maier","felix.m@mail.de","2","€31.00","canceled")
+    ];
+    const first = mk("#0847","Aug 14","Lena Hoffmann","lena.hoffmann@example.com","3","€56.40","open");
+    const stats = [
+      {v:"8", k:"ORDERS THIS WEEK"},
+      {v:"3", k:"OPEN"},
+      {v:"€298.10", k:"WEEK REVENUE"},
+      {v:"18", k:"BAGS TO ROAST"}
+    ];
+    return { orders: rows, cards: [first].concat(rows.slice(0,5)), mobileCards: rows.slice(0,3), stats };
+  }
+}
+</script>
+</body>
+</html>

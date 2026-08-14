@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D4;font-family:Inter,sans-serif;color:#2E211A}a{color:#C65F3D;text-decoration:none}a:hover{color:#A94C2F}</style>
+</helmet>
+<div style="padding:40px 48px 80px;display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">EMBER &amp; OAK · PAGE 4 OF 7 · EMBER DARK</div>
+    <h1 style="font-family:Fraunces,serif;font-size:30px;font-weight:600;margin:0">Shopping cart</h1>
+    <p style="font-size:13px;line-height:1.6;color:#7A6A5C;margin:0">Dark slide-over drawer with the "added to cart" toast and free-shipping meter, full cart page, full-screen mobile drawer, and empty state. Flat shipping €4.90, free over €49.</p>
+    <div style="display:flex;gap:16px;font-size:12px;font-weight:500;flex-wrap:wrap"><a href="3 Product Detail.dc.html">← Product detail</a><a href="5 Checkout.dc.html">Checkout →</a></div>
+  </div>
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Cart · Drawer over shop · Desktop 1440">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">DRAWER + TOAST · DESKTOP 1440 (JUST ADDED AN ITEM)</div>
+      <div style="width:1440px;height:840px;background:#FAF6EF;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden;position:relative">
+        <div style="background:#2E211A;padding-bottom:70px">
+          <div style="text-align:center;font:500 11px IBM Plex Mono,monospace;letter-spacing:.14em;color:#EFE4D8;background:rgba(239,228,216,.07);padding:9px 16px;border-bottom:1px solid rgba(239,228,216,.12)">BATCH № 214 ROASTED TUE 12 AUG · FREE EU SHIPPING OVER €49</div>
+          <header style="display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:84px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="display:flex;align-items:center;gap:11px"><span style="width:11px;height:11px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span></span>
+            <nav style="display:flex;align-items:center;gap:32px;font:500 14px Inter,sans-serif"><span style="color:#E4A07F">Shop</span><span style="color:#EFE4D8">About</span><span style="color:#EFE4D8">Brew guides</span><span style="display:flex;align-items:center;gap:8px;border:1px solid #E4A07F;border-radius:999px;padding:9px 17px;color:#FAF6EF">Cart<span style="background:#C65F3D;color:#fff;min-width:20px;height:20px;border-radius:999px;font:700 11px Inter,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 5px">2</span></span></nav>
+          </header>
+          <div style="padding:40px 56px 0;display:flex;flex-direction:column;gap:12px"><span style="font:500 12px IBM Plex Mono,monospace;letter-spacing:.18em;color:#E4A07F">THE SHOP · 12 PRODUCTS</span><span style="font-family:Fraunces,serif;font-size:44px;font-weight:600;color:#FAF6EF">Everything roasted in-house.</span></div>
+        </div>
+        <div style="padding:26px 56px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:-50px;position:relative">
+          <sc-for list="{{ ghosts }}" as="g" hint-placeholder-count="4">
+            <div style="background:#FFFFFF;border-radius:14px;overflow:hidden;box-shadow:0 14px 34px rgba(46,33,26,.1)"><div style="aspect-ratio:1/1;background:repeating-linear-gradient(45deg,#F0E7D8 0 12px,#E9DECB 12px 24px)"></div><div style="padding:20px;display:flex;flex-direction:column;gap:8px"><div style="height:14px;width:70%;background:#EFE6D8;border-radius:4px"></div><div style="height:10px;width:45%;background:#F3ECDF;border-radius:4px"></div></div></div>
+          </sc-for>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(19,12,9,.55)"></div>
+        <div style="position:absolute;left:56px;bottom:40px;background:#FFFFFF;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 18px 44px rgba(0,0,0,.35)">
+          <span style="width:26px;height:26px;border-radius:50%;background:#5C8A5C;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:700">✓</span>
+          <span style="display:flex;flex-direction:column;gap:1px"><span style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:#7A6A5C">ADDED TO CART</span><span style="font:600 14px Inter,sans-serif">Sunrise Single Origin – Ethiopia 250g</span></span>
+        </div>
+        <aside style="position:absolute;top:0;right:0;bottom:0;width:450px;background:#2E211A;box-shadow:-30px 0 70px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden">
+          <div style="position:absolute;width:560px;height:560px;border-radius:50%;left:-140px;top:-300px;background:radial-gradient(circle,rgba(198,95,61,.34),rgba(198,95,61,0) 68%)"></div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:24px 28px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;color:#FAF6EF">Your cart</span><span style="font:11px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.55)">2 ITEMS · BATCH № 214</span></span>
+            <button style="width:38px;height:38px;border-radius:999px;background:none;border:1px solid rgba(239,228,216,.3);font-size:15px;color:#EFE4D8;cursor:pointer" style-hover="border-color:#E4A07F;color:#E4A07F">✕</button>
+          </div>
+          <div style="position:relative;padding:18px 28px;border-bottom:1px solid rgba(239,228,216,.16);display:flex;flex-direction:column;gap:9px">
+            <span style="font:12.5px Inter,sans-serif;color:rgba(239,228,216,.72)"><strong style="color:#FAF6EF">€17.60</strong> away from free shipping</span>
+            <span style="height:6px;border-radius:999px;background:rgba(239,228,216,.16);overflow:hidden;display:block"><span style="width:64%;height:100%;background:#C65F3D;border-radius:999px;display:block"></span></span>
+          </div>
+          <div style="position:relative;flex:1;overflow:hidden;padding:6px 28px;display:flex;flex-direction:column">
+            <sc-for list="{{ drawerItems }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;gap:16px;padding:18px 0;border-bottom:1px solid rgba(239,228,216,.14)">
+                <span style="width:76px;height:76px;border-radius:10px;flex:none;background:repeating-linear-gradient(45deg,#3B2A21 0 8px,#463227 8px 16px)"></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <span style="display:flex;justify-content:space-between;gap:10px"><span style="font-family:Fraunces,serif;font-size:15px;font-weight:600;line-height:1.3;color:#FAF6EF">{{ it.name }}</span><button style="background:none;border:none;color:rgba(239,228,216,.6);font-size:14px;cursor:pointer;padding:0;height:20px" style-hover="color:#E4A07F">✕</button></span>
+                  <span style="font:11px IBM Plex Mono,monospace;letter-spacing:.06em;color:rgba(239,228,216,.55)">{{ it.unit }} EACH</span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+                    <span style="display:flex;align-items:center;background:rgba(239,228,216,.08);border:1px solid rgba(239,228,216,.22);border-radius:999px;overflow:hidden"><button style="width:34px;height:34px;background:none;border:none;font-size:15px;color:#EFE4D8;cursor:pointer">−</button><span style="width:26px;text-align:center;font:600 13px Inter,sans-serif;color:#FAF6EF">{{ it.qty }}</span><button style="width:34px;height:34px;background:none;border:none;font-size:15px;color:#EFE4D8;cursor:pointer">+</button></span>
+                    <span style="font:600 15px Inter,sans-serif;color:#FAF6EF">{{ it.line }}</span>
+                  </span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:relative;padding:22px 28px 28px;background:#FAF6EF;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:#7A6A5C"><span>Subtotal</span><span style="color:#2E211A;font-weight:500">€31.40</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:#7A6A5C"><span>Shipping</span><span style="color:#2E211A;font-weight:500">€4.90</span></div>
+            <div style="display:flex;justify-content:space-between;font:600 18px Inter,sans-serif;border-top:1px solid #E8DFD2;padding-top:12px"><span>Total</span><span>€36.30</span></div>
+            <a href="5 Checkout.dc.html" style="background:#C65F3D;color:#fff;border-radius:999px;height:52px;font:600 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:6px" style-hover="background:#A94C2F;color:#fff">Proceed to checkout</a>
+            <a href="4 Cart.dc.html" style="text-align:center;font:600 13px Inter,sans-serif;padding:6px">View full cart</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Cart · Full page · Desktop 1440">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">FULL CART PAGE · DESKTOP 1440 (FREE SHIPPING REACHED)</div>
+      <div style="width:1440px;background:#FAF6EF;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden">
+        <div style="position:relative;background:#2E211A;overflow:hidden;padding-bottom:80px">
+          <div style="position:absolute;width:820px;height:820px;border-radius:50%;right:-200px;top:-380px;background:radial-gradient(circle,rgba(198,95,61,.36),rgba(198,95,61,0) 68%)"></div>
+          <header style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:84px;border-bottom:1px solid rgba(239,228,216,.16)">
+            <span style="display:flex;align-items:center;gap:11px"><span style="width:11px;height:11px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span></span>
+            <nav style="display:flex;align-items:center;gap:32px;font:500 14px Inter,sans-serif"><a href="2 Shop.dc.html" style="color:#EFE4D8">Shop</a><a href="#" style="color:#EFE4D8">About</a><span style="display:flex;align-items:center;gap:8px;border:1px solid #E4A07F;border-radius:999px;padding:9px 17px;color:#FAF6EF">Cart<span style="background:#C65F3D;color:#fff;min-width:20px;height:20px;border-radius:999px;font:700 11px Inter,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 5px">4</span></span></nav>
+          </header>
+          <div style="position:relative;padding:44px 56px 0;display:flex;align-items:flex-end;justify-content:space-between">
+            <span style="display:flex;flex-direction:column;gap:12px"><span style="font:500 12px IBM Plex Mono,monospace;letter-spacing:.18em;color:#E4A07F">YOUR CART · 4 ITEMS</span><span style="font-family:Fraunces,serif;font-size:52px;line-height:1;font-weight:600;color:#FAF6EF">Ready when you are.</span></span>
+            <a href="2 Shop.dc.html" style="font:500 12px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.72)" style-hover="color:#E4A07F">← CONTINUE SHOPPING</a>
+          </div>
+        </div>
+        <div style="padding:0 56px 88px">
+          <div style="display:grid;grid-template-columns:1fr 410px;gap:32px;align-items:start;margin-top:-56px;position:relative">
+            <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 20px 48px rgba(46,33,26,.14);padding:8px 28px">
+              <sc-for list="{{ pageItems }}" as="it" hint-placeholder-count="3">
+                <div style="display:flex;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid #E8DFD2">
+                  <span style="width:92px;height:92px;border-radius:10px;flex:none;background:repeating-linear-gradient(45deg,#F0E7D8 0 9px,#E9DECB 9px 18px)"></span>
+                  <span style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-family:Fraunces,serif;font-size:18px;font-weight:600">{{ it.name }}</span><span style="font:11px IBM Plex Mono,monospace;letter-spacing:.08em;color:#7A6A5C">{{ it.meta }} · {{ it.unit }} EACH</span></span>
+                  <span style="display:flex;align-items:center;background:#FAF6EF;border:1px solid #E8DFD2;border-radius:999px;overflow:hidden"><button style="width:40px;height:40px;background:none;border:none;font-size:16px;color:#7A6A5C;cursor:pointer" style-hover="color:#C65F3D">−</button><span style="width:30px;text-align:center;font:600 14px Inter,sans-serif">{{ it.qty }}</span><button style="width:40px;height:40px;background:none;border:none;font-size:16px;color:#7A6A5C;cursor:pointer" style-hover="color:#C65F3D">+</button></span>
+                  <span style="font:600 17px Inter,sans-serif;width:82px;text-align:right">{{ it.line }}</span>
+                  <button style="background:none;border:none;color:#7A6A5C;font-size:16px;cursor:pointer;width:36px;height:36px" style-hover="color:#B0483B">✕</button>
+                </div>
+              </sc-for>
+              <div style="padding:18px 0;display:flex;justify-content:space-between;align-items:center"><a href="2 Shop.dc.html" style="font:600 14px Inter,sans-serif">← Continue shopping</a><span style="font:11px IBM Plex Mono,monospace;letter-spacing:.08em;color:#7A6A5C">ROASTED TUE 12 AUG · SHIPS WED</span></div>
+            </div>
+            <div style="background:#2E211A;border-radius:14px;box-shadow:0 20px 48px rgba(46,33,26,.24);padding:28px;display:flex;flex-direction:column;gap:14px;position:sticky;top:24px">
+              <span style="font-family:Fraunces,serif;font-size:23px;font-weight:600;color:#FAF6EF">Summary</span>
+              <div style="background:rgba(92,138,92,.18);border:1px solid rgba(92,138,92,.5);border-radius:10px;padding:11px 14px;font:600 12.5px Inter,sans-serif;color:#A8CDA8">✓ You've unlocked free shipping</div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:rgba(239,228,216,.7)"><span>Subtotal (4 items)</span><span style="color:#FAF6EF;font-weight:500">€56.40</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:rgba(239,228,216,.7)"><span>Shipping</span><span style="color:#A8CDA8;font-weight:600">Free</span></div>
+              <div style="display:flex;justify-content:space-between;font:600 20px Inter,sans-serif;color:#FAF6EF;border-top:1px solid rgba(239,228,216,.18);padding-top:14px"><span>Total</span><span>€56.40</span></div>
+              <span style="font:10px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.5);margin-top:-6px">INCL. VAT</span>
+              <a href="5 Checkout.dc.html" style="background:#C65F3D;color:#fff;border-radius:999px;height:52px;font:600 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:6px" style-hover="background:#A94C2F;color:#fff">Proceed to checkout</a>
+            </div>
+          </div>
+        </div>
+        <footer style="background:#4A3428;color:#EFE4D8;padding:44px 56px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:Fraunces,serif;font-size:22px;font-weight:600">Ember &amp; Oak</span>
+          <span style="font:11px IBM Plex Mono,monospace;letter-spacing:.06em;color:rgba(239,228,216,.5)">FLAT €4.90 SHIPPING · FREE OVER €49</span>
+        </footer>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Cart · Full-screen drawer · Mobile 390">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">FULL-SCREEN DRAWER · MOBILE 390</div>
+      <div style="width:390px;height:770px;background:#2E211A;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden;display:flex;flex-direction:column;position:relative">
+        <div style="position:absolute;width:500px;height:500px;border-radius:50%;left:-120px;top:-250px;background:radial-gradient(circle,rgba(198,95,61,.36),rgba(198,95,61,0) 68%)"></div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(239,228,216,.16)">
+          <span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fraunces,serif;font-size:20px;font-weight:600;color:#FAF6EF">Your cart</span><span style="font:10px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(239,228,216,.55)">2 ITEMS</span></span>
+          <button style="width:44px;height:44px;border-radius:999px;background:none;border:1px solid rgba(239,228,216,.3);font-size:15px;color:#EFE4D8;cursor:pointer">✕</button>
+        </div>
+        <div style="position:relative;padding:14px 20px;border-bottom:1px solid rgba(239,228,216,.16);display:flex;flex-direction:column;gap:8px">
+          <span style="font:12px Inter,sans-serif;color:rgba(239,228,216,.72)"><strong style="color:#FAF6EF">€17.60</strong> away from free shipping</span>
+          <span style="height:6px;border-radius:999px;background:rgba(239,228,216,.16);overflow:hidden;display:block"><span style="width:64%;height:100%;background:#C65F3D;border-radius:999px;display:block"></span></span>
+        </div>
+        <div style="position:relative;flex:1;padding:4px 20px;display:flex;flex-direction:column;overflow:hidden">
+          <sc-for list="{{ drawerItems }}" as="it" hint-placeholder-count="2">
+            <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,228,216,.14)">
+              <span style="width:68px;height:68px;border-radius:10px;flex:none;background:repeating-linear-gradient(45deg,#3B2A21 0 8px,#463227 8px 16px)"></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <span style="display:flex;justify-content:space-between;gap:8px"><span style="font-family:Fraunces,serif;font-size:14px;font-weight:600;line-height:1.3;color:#FAF6EF">{{ it.name }}</span><button style="background:none;border:none;color:rgba(239,228,216,.6);font-size:14px;cursor:pointer;padding:0;width:24px;height:24px">✕</button></span>
+                <span style="font:10px IBM Plex Mono,monospace;letter-spacing:.06em;color:rgba(239,228,216,.55)">{{ it.unit }} EACH</span>
+                <span style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+                  <span style="display:flex;align-items:center;background:rgba(239,228,216,.08);border:1px solid rgba(239,228,216,.22);border-radius:999px;overflow:hidden"><button style="width:44px;height:40px;background:none;border:none;font-size:16px;color:#EFE4D8;cursor:pointer">−</button><span style="width:24px;text-align:center;font:600 13px Inter,sans-serif;color:#FAF6EF">{{ it.qty }}</span><button style="width:44px;height:40px;background:none;border:none;font-size:16px;color:#EFE4D8;cursor:pointer">+</button></span>
+                  <span style="font:600 14px Inter,sans-serif;color:#FAF6EF">{{ it.line }}</span>
+                </span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="position:relative;padding:18px 20px 26px;background:#FAF6EF;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;justify-content:space-between;font-size:14px;color:#7A6A5C"><span>Subtotal</span><span style="color:#2E211A;font-weight:500">€31.40</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;color:#7A6A5C"><span>Shipping</span><span style="color:#2E211A;font-weight:500">€4.90</span></div>
+          <div style="display:flex;justify-content:space-between;font:600 17px Inter,sans-serif;border-top:1px solid #E8DFD2;padding-top:11px"><span>Total</span><span>€36.30</span></div>
+          <a href="5 Checkout.dc.html" style="background:#C65F3D;color:#fff;border-radius:999px;height:52px;font:600 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:4px" style-hover="background:#A94C2F;color:#fff">Proceed to checkout</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="Cart · Empty state · Mobile 390">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:11px;color:#7A6A5C;letter-spacing:.08em">EMPTY CART · MOBILE 390</div>
+      <div style="width:390px;height:770px;background:#2E211A;box-shadow:0 12px 48px rgba(46,33,26,.18);overflow:hidden;display:flex;flex-direction:column;position:relative">
+        <div style="position:absolute;width:520px;height:520px;border-radius:50%;left:-130px;top:-260px;background:radial-gradient(circle,rgba(198,95,61,.38),rgba(198,95,61,0) 68%)"></div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(239,228,216,.16)">
+          <span style="font-family:Fraunces,serif;font-size:20px;font-weight:600;color:#FAF6EF">Your cart</span>
+          <button style="width:44px;height:44px;border-radius:999px;background:none;border:1px solid rgba(239,228,216,.3);font-size:15px;color:#EFE4D8;cursor:pointer">✕</button>
+        </div>
+        <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center">
+          <div style="width:140px;height:140px;border-radius:50%;background:repeating-linear-gradient(45deg,#3B2A21 0 11px,#463227 11px 22px);display:flex;align-items:center;justify-content:center"><span style="font:9px IBM Plex Mono,monospace;color:#C9B8A8;background:rgba(46,33,26,.75);padding:3px 7px;border-radius:4px">empty cup illo</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:Fraunces,serif;font-size:26px;font-weight:600;color:#FAF6EF">Your cart is empty</span>
+            <span style="font:14px/1.6 Inter,sans-serif;color:rgba(239,228,216,.68);max-width:28ch">Nothing brewing yet. The good stuff is one shelf away.</span>
+          </div>
+          <a href="2 Shop.dc.html" style="background:#C65F3D;color:#fff;border-radius:999px;height:52px;padding:0 28px;font:600 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center" style-hover="background:#A94C2F;color:#fff">Browse the shop</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const drawerItems = [
+      {name:"Ember Blend – Dark Roast 250g", unit:"€14.90", qty:"1", line:"€14.90"},
+      {name:"Sunrise Single Origin – Ethiopia 250g", unit:"€16.50", qty:"1", line:"€16.50"}
+    ];
+    const pageItems = [
+      {name:"Ember Blend – Dark Roast", meta:"250 G · WHOLE BEAN", unit:"€14.90", qty:"1", line:"€14.90"},
+      {name:"Sunrise Single Origin – Ethiopia", meta:"250 G · WHOLE BEAN", unit:"€16.50", qty:"2", line:"€33.00"},
+      {name:"Honey Almond Granola", meta:"500 G JAR", unit:"€8.50", qty:"1", line:"€8.50"}
+    ];
+    return { drawerItems, pageItems, ghosts:[1,2,3,4] };
+  }
+}
+</script>
+</body>
+</html>

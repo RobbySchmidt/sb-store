@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D4;font-family:Inter,sans-serif;color:#2E211A}a{color:#C65F3D;text-decoration:none}a:hover{color:#A94C2F}</style>
+</helmet>
+<div style="padding:0 0 64px;display:flex;flex-direction:column">
+  <div style="position:relative;background:#2E211A;overflow:hidden;padding:56px 56px 88px">
+    <div style="position:absolute;width:900px;height:900px;border-radius:50%;left:-200px;top:-400px;background:radial-gradient(circle,rgba(198,95,61,.4),rgba(198,95,61,0) 68%)"></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:16px;max-width:70ch">
+      <span style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:50%;background:#C65F3D"></span><span style="font-family:Fraunces,serif;font-size:34px;font-weight:600;color:#FAF6EF">Ember &amp; Oak</span></span>
+      <span style="font:500 12px IBM Plex Mono,monospace;letter-spacing:.16em;color:#E4A07F">COMPLETE STORE DESIGN · DIRECTION "EMBER DARK"</span>
+      <p style="font:15px/1.75 Inter,sans-serif;color:rgba(239,228,216,.72);margin:0">Seven pages, each at desktop 1440 / tablet 768 / mobile 390, plus drawer, empty, toast and expanded states. Dark espresso bands carry the headers and summaries; cream cards overlap up into them. Striped tiles mark where warm, natural food photography drops in.</p>
+    </div>
+  </div>
+  <div style="padding:0 56px;display:flex;flex-direction:column;gap:40px;max-width:1120px">
+    <div style="display:flex;gap:22px;flex-wrap:wrap;margin-top:-56px;position:relative">
+      <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 20px 48px rgba(46,33,26,.16);padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#7A6A5C">PALETTE</span>
+        <div style="display:flex;gap:10px">
+          <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="8">
+            <span style="display:flex;flex-direction:column;gap:6px;align-items:center">
+              <span style="width:52px;height:52px;border-radius:10px;border:1px solid #E8DFD2;background:{{ s.hex }};display:block"></span>
+              <span style="font:9px IBM Plex Mono,monospace;color:#7A6A5C">{{ s.hex }}</span>
+              <span style="font:10px Inter,sans-serif;color:#7A6A5C">{{ s.name }}</span>
+            </span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border-radius:14px;box-shadow:0 20px 48px rgba(46,33,26,.16);padding:24px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:300px">
+        <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#7A6A5C">TYPE &amp; SYSTEM</span>
+        <span style="font-family:Fraunces,serif;font-size:26px;font-weight:600">Fraunces — headlines</span>
+        <span style="font:15px Inter,sans-serif">Inter — body &amp; UI, prices at weight 600</span>
+        <span style="font:12px IBM Plex Mono,monospace;letter-spacing:.06em;color:#7A6A5C">IBM PLEX MONO — BATCH DATA, LABELS, META</span>
+        <span style="font:13px Inter,sans-serif;color:#7A6A5C">14px radius · pill buttons · soft warm shadows · 44px touch targets on tablet/mobile</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#7A6A5C">PAGES</span>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <a href="{{ p.href }}" style="background:#FFFFFF;border-radius:14px;box-shadow:0 14px 34px rgba(46,33,26,.1);padding:22px;display:flex;flex-direction:column;gap:8px;color:#2E211A;transition:transform .2s,box-shadow .2s" style-hover="transform:translateY(-4px);box-shadow:0 24px 52px rgba(46,33,26,.16);color:#2E211A">
+            <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#C65F3D">{{ p.no }}</span>
+            <span style="font-family:Fraunces,serif;font-size:19px;font-weight:600">{{ p.title }}</span>
+            <span style="font:13px/1.55 Inter,sans-serif;color:#7A6A5C">{{ p.desc }}</span>
+            <span style="font:600 13px Inter,sans-serif;color:#C65F3D;margin-top:4px">Open →</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="font:600 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#7A6A5C">ARCHIVE — EARLIER EXPLORATIONS</span>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:740px">
+        <a href="1 Homepage.dc.html" style="background:#F3ECDE;border:1px solid #E8DFD2;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:6px;color:#2E211A">
+          <span style="font-family:Fraunces,serif;font-size:17px;font-weight:600">Homepage — original cream</span>
+          <span style="font:13px/1.55 Inter,sans-serif;color:#7A6A5C">The first, lighter homepage. Kept for reference.</span>
+        </a>
+        <a href="1 Homepage Directions.dc.html" style="background:#F3ECDE;border:1px solid #E8DFD2;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:6px;color:#2E211A">
+          <span style="font-family:Fraunces,serif;font-size:17px;font-weight:600">Three homepage directions</span>
+          <span style="font:13px/1.55 Inter,sans-serif;color:#7A6A5C">Roast ledger · Ember dark (chosen) · Paper labels.</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const swatches = [
+      {hex:"#2E211A", name:"Espresso"},
+      {hex:"#4A3428", name:"Deep brown"},
+      {hex:"#FAF6EF", name:"Cream"},
+      {hex:"#C65F3D", name:"Terracotta"},
+      {hex:"#A94C2F", name:"Hover"},
+      {hex:"#E4A07F", name:"Ember"},
+      {hex:"#7A6A5C", name:"Muted"},
+      {hex:"#E8DFD2", name:"Border"}
+    ];
+    const pages = [
+      {no:"01", title:"Homepage — Ember Dark", desc:"Dark hero with ember glow, overlapping cards, tannery story, newsletter band.", href:"1 Homepage Ember Dark.dc.html"},
+      {no:"02", title:"Shop listing", desc:"Dark shelf header, floating filter bar, 4/3/2-col grid, dark empty state.", href:"2 Shop.dc.html"},
+      {no:"03", title:"Product detail", desc:"Gallery on dark, info card overlapping, roast-profile scale, sticky mobile bar.", href:"3 Product Detail.dc.html"},
+      {no:"04", title:"Cart", desc:"Dark slide-over with toast + free-shipping meter, full page, empty state.", href:"4 Cart.dc.html"},
+      {no:"05", title:"Checkout + confirmation", desc:"2 steps, dark summary sidebar / accordion, demo payment, thank-you screen.", href:"5 Checkout.dc.html"},
+      {no:"06", title:"Admin orders", desc:"Dark topbar with counters, dense table, status badges, card collapse.", href:"6 Admin.dc.html"}
+    ];
+    return { swatches, pages };
+  }
+}
+</script>
+</body>
+</html>
