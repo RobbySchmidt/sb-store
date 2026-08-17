@@ -58,6 +58,8 @@ export interface Order {
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
+  cancel_reason: string | null
+  cancel_note: string | null
   created_at: string
   order_items: OrderItem[]
 }

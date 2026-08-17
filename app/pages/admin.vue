@@ -3,7 +3,9 @@ import type { Order, OrderStatus } from '~/types/shop'
 
 definePageMeta({ layout: false })
 
-const { data: ordersData, refresh } = await useFetch<Order[]>('/api/admin/orders')
+// deep: true — Nuxt 4 defaults useFetch data to a shallowRef, which would not
+// react to the optimistic `order.status = …` mutation in setStatus() below
+const { data: ordersData, refresh } = await useFetch<Order[]>('/api/admin/orders', { deep: true })
 const orders = computed(() => ordersData.value ?? [])
 
 const statusFilter = ref<'all' | OrderStatus>('all')
@@ -58,19 +60,52 @@ const filtered = computed(() => {
 
 // ---- status change (optimistic) ----
 const saving = ref<string | null>(null)
-async function setStatus(order: Order, status: OrderStatus) {
+async function setStatus(
+  order: Order,
+  status: OrderStatus,
+  extra?: { reason: string | null; note: string | null },
+) {
   if (order.status === status || saving.value) return
-  const prev = order.status
+  const prev = { status: order.status, reason: order.cancel_reason, note: order.cancel_note }
+
+  // the reason columns belong to a cancellation — any other status clears them, like the server does
+  const reason = status === 'canceled' ? extra?.reason ?? null : null
+  const note = status === 'canceled' ? extra?.note ?? null : null
+
   order.status = status
+  order.cancel_reason = reason
+  order.cancel_note = note
   saving.value = order.id
   try {
-    await $fetch(`/api/admin/orders/${order.id}`, { method: 'PATCH', body: { status } })
+    await $fetch(`/api/admin/orders/${order.id}`, {
+      method: 'PATCH',
+      body: extra ? { status, reason, note } : { status },
+    })
   } catch {
-    order.status = prev
+    order.status = prev.status
+    order.cancel_reason = prev.reason
+    order.cancel_note = prev.note
     await refresh()
   } finally {
     saving.value = null
   }
+}
+
+// ---- cancellation dialog ----
+// shallowRef: the entry already is the reactive order object from `orders`
+const cancelTarget = shallowRef<Order | null>(null)
+
+function pickStatus(order: Order, status: OrderStatus) {
+  if (status !== 'canceled') return setStatus(order, status)
+  // canceling asks for a reason first — nothing is touched until the dialog confirms
+  if (order.status === 'canceled' || saving.value) return
+  cancelTarget.value = order
+}
+
+function confirmCancel(payload: { reason: string | null; note: string | null }) {
+  const order = cancelTarget.value
+  cancelTarget.value = null
+  if (order) setStatus(order, 'canceled', payload)
 }
 
 function toggleExpand(id: string) {
@@ -206,7 +241,7 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                 :key="s"
                 class="grow rounded-full px-2 py-1.5 text-xs font-medium transition-colors"
                 :class="order.status === s ? segmentFill[s] : 'text-muted hover:text-espresso'"
-                @click="setStatus(order, s)"
+                @click="pickStatus(order, s)"
               >
                 {{ s === 'canceled' ? 'Cancel' : badgeStyles[s].label }}
               </button>
@@ -237,6 +272,18 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                   {{ order.customer_name }}<br>
                   {{ order.street }}<br>
                   {{ order.zip }} {{ order.city }}, {{ order.country }}
+                </p>
+              </div>
+              <div
+                v-if="order.status === 'canceled' && (order.cancel_reason || order.cancel_note)"
+                class="col-span-2 rounded-xl bg-cream p-5"
+              >
+                <p class="mono-label text-[10px] font-semibold text-muted">CANCELED BECAUSE</p>
+                <p v-if="findCancelReason(order.cancel_reason)" class="mt-3 text-[13px] font-medium text-status-canceled-text">
+                  {{ findCancelReason(order.cancel_reason)?.label }}
+                </p>
+                <p v-if="order.cancel_note" class="mt-2 text-[13px] leading-relaxed text-muted">
+                  {{ order.cancel_note }}
                 </p>
               </div>
             </div>
@@ -291,6 +338,15 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
             <p class="mt-2 text-[13px] leading-relaxed">
               {{ order.customer_name }}, {{ order.street }}, {{ order.zip }} {{ order.city }}
             </p>
+            <template v-if="order.status === 'canceled' && (order.cancel_reason || order.cancel_note)">
+              <p class="mono-label mt-4 text-[10px] font-semibold text-muted">CANCELED BECAUSE</p>
+              <p v-if="findCancelReason(order.cancel_reason)" class="mt-2 text-[13px] font-medium text-status-canceled-text">
+                {{ findCancelReason(order.cancel_reason)?.label }}
+              </p>
+              <p v-if="order.cancel_note" class="mt-1.5 text-[13px] leading-relaxed text-muted">
+                {{ order.cancel_note }}
+              </p>
+            </template>
           </div>
 
           <div class="mt-4 flex rounded-full border border-line bg-white p-0.5">
@@ -299,7 +355,7 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
               :key="s"
               class="min-h-11 grow rounded-full px-2 text-[13px] font-medium transition-colors"
               :class="order.status === s ? segmentFill[s] : 'text-muted'"
-              @click="setStatus(order, s)"
+              @click="pickStatus(order, s)"
             >
               {{ s === 'canceled' ? 'Cancel' : badgeStyles[s].label }}
             </button>
@@ -311,5 +367,12 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
         </div>
       </div>
     </div>
+
+    <CancelDialog
+      v-if="cancelTarget"
+      :order="cancelTarget"
+      @close="cancelTarget = null"
+      @confirm="confirmCancel"
+    />
   </div>
 </template>

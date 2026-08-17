@@ -1,4 +1,7 @@
-import { buildOrderConfirmation, type OrderEmailOrder } from '../../utils/orderEmail'
+import { buildOrderCanceled } from '../../utils/email/canceled'
+import { buildOrderConfirmation } from '../../utils/email/confirmation'
+import { buildOrderShipped } from '../../utils/email/shipped'
+import type { OrderEmailOrder } from '../../utils/email/shell'
 
 const SAMPLE: OrderEmailOrder = {
   order_number: 'EO-2026-0842',
@@ -19,9 +22,40 @@ const SAMPLE: OrderEmailOrder = {
   ],
 }
 
-/** Dev-only: renders the confirmation mail in the browser. 404s in production. */
+/**
+ * Dev-only: renders one of the order mails in the browser. 404s in production.
+ *
+ * ?template=confirmation (default) | shipped | canceled
+ * ?reason=none  — canceled only: drop reason and note, to preview the bare variant.
+ */
 export default defineEventHandler((event) => {
   if (!import.meta.dev) throw createError({ statusCode: 404, statusMessage: 'Not found' })
+
+  const { template = 'confirmation', reason } = getQuery(event)
+
+  let html: string
+  switch (template) {
+    case 'confirmation':
+      html = buildOrderConfirmation(SAMPLE).html
+      break
+    case 'shipped':
+      html = buildOrderShipped(SAMPLE).html
+      break
+    case 'canceled':
+      html = buildOrderCanceled(
+        reason === 'none'
+          ? { ...SAMPLE, cancel_reason: null, cancel_note: null }
+          : {
+              ...SAMPLE,
+              cancel_reason: 'out_of_stock',
+              cancel_note: 'The Ethiopia lot sold out faster than we expected — sorry!',
+            },
+      ).html
+      break
+    default:
+      throw createError({ statusCode: 400, statusMessage: `Unknown template: ${String(template)}` })
+  }
+
   setHeader(event, 'content-type', 'text/html; charset=utf-8')
-  return buildOrderConfirmation(SAMPLE).html
+  return html
 })

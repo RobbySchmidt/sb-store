@@ -1,4 +1,5 @@
 import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '../../shared/utils/shop'
+import { sendOrderConfirmation } from '../utils/email/confirmation'
 
 interface OrderPayload {
   customer: {

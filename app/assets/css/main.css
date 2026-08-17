@@ -51,6 +51,12 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Tailwind v4 dropped cursor:pointer for buttons from its preflight — restore it */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer components {
