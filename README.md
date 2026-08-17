@@ -2,6 +2,40 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
+## Setting up on a new machine
+
+Everything needed to run this project is in the repo except `.env`, which holds
+the Supabase keys and is deliberately gitignored — `SUPABASE_SECRET_KEY` is the
+service-role key and bypasses row level security, so it must never be pushed.
+
+Requirements: Node, [yarn](https://yarnpkg.com/), and Docker Desktop (for the
+local mail catcher).
+
+```bash
+git clone <repo-url> sb-store
+cd sb-store
+yarn install
+cp .env.example .env      # then fill in the Supabase values, see below
+docker compose up -d      # pulls and starts Mailpit
+yarn dev
+```
+
+Fill the four Supabase values in `.env` from the Supabase dashboard of the
+existing project — **Project Settings → API** gives you the project URL and both
+keys, **Project Settings → Database** gives you the connection string:
+
+| `.env` key | Where it comes from |
+| --- | --- |
+| `SUPABASE_URL` | Project URL |
+| `SUPABASE_KEY` | anon / publishable key |
+| `SUPABASE_SECRET_KEY` | service_role / secret key — server-side only |
+| `DATABASE_URL` | Database connection string |
+
+The `MAIL_*` values in `.env.example` already point at the local Mailpit
+container and need no changes. The database itself is hosted at Supabase, so
+both machines share the same data — no migration or seeding needed on the
+second machine.
+
 ## Setup
 
 Make sure to install dependencies:
