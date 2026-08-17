@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { CartItem, Product } from '~/types/shop'
-import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '~/composables/useShop'
+import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '~~/shared/utils/shop'
 
 const STORAGE_KEY = 'eo-cart'
 const LAST_ORDER_KEY = 'eo-last-order'

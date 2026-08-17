@@ -1,5 +1,4 @@
-const FREE_SHIPPING_CENTS = 4900
-const SHIPPING_FLAT_CENTS = 490
+import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '../../shared/utils/shop'
 
 interface OrderPayload {
   customer: {
