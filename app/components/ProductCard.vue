@@ -9,6 +9,16 @@ const props = defineProps<{
 
 const cart = useCartStore()
 const badge = computed(() => badgeLabel(props.product.categories?.slug))
+
+const STOCK_TONE_CLASS: Record<'out' | 'low' | 'ok', string> = {
+  out: 'text-status-canceled',
+  // the darker -text variant: plain status-open is only 2.4:1 on white at 10px
+  low: 'text-status-open-text',
+  ok: 'text-muted',
+}
+
+const soldOut = computed(() => props.product.stock <= 0)
+const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock)])
 </script>
 
 <template>
@@ -28,6 +38,12 @@ const badge = computed(() => badgeLabel(props.product.categories?.slug))
       <span class="mono-label absolute left-3.5 top-3.5 rounded-full bg-espresso px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-cream">
         {{ badge }}
       </span>
+      <span
+        v-if="soldOut"
+        class="mono-label absolute right-3.5 top-3.5 rounded-full bg-status-canceled px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white"
+      >
+        OUT OF STOCK
+      </span>
     </div>
 
     <div class="flex grow flex-col p-4 lg:p-5">
@@ -37,10 +53,16 @@ const badge = computed(() => badgeLabel(props.product.categories?.slug))
       <div class="mt-auto pt-4">
         <!-- desktop/tablet: price + circular add -->
         <div class="hidden md:flex items-center justify-between">
-          <span class="text-[17px] font-semibold">{{ fmtPrice(product.price_cents) }}</span>
+          <div>
+            <span class="text-[17px] font-semibold">{{ fmtPrice(product.price_cents) }}</span>
+            <p class="mono-label mt-1 text-[10px] font-semibold" :class="stockClass">
+              {{ stockLabel(product.stock) }}
+            </p>
+          </div>
           <button
-            class="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-espresso text-white transition-colors hover:bg-terra"
+            class="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-espresso text-white transition-colors hover:bg-terra disabled:opacity-40 disabled:hover:bg-espresso"
             :aria-label="`Add ${product.name} to cart`"
+            :disabled="product.stock <= 0"
             @click.prevent.stop="cart.add(product)"
           >
             <Icon name="Plus" :size="19" :stroke-width="2.5" />
@@ -49,8 +71,12 @@ const badge = computed(() => badgeLabel(props.product.categories?.slug))
         <!-- mobile: price + full-width add -->
         <div class="md:hidden">
           <span class="text-base font-semibold">{{ fmtPrice(product.price_cents) }}</span>
+          <p class="mono-label mt-1 text-[10px] font-semibold" :class="stockClass">
+            {{ stockLabel(product.stock) }}
+          </p>
           <button
-            class="mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-[10px] bg-espresso text-sm font-semibold text-white transition-colors active:bg-terra"
+            class="mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-[10px] bg-espresso text-sm font-semibold text-white transition-colors active:bg-terra disabled:opacity-40"
+            :disabled="product.stock <= 0"
             @click.prevent.stop="cart.add(product)"
           >
             <Icon name="Plus" :size="16" :stroke-width="2.5" />

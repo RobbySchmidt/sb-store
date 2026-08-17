@@ -56,7 +56,16 @@ export default defineEventHandler(async (event) => {
     .eq('id', id)
     .select('*, order_items(*)')
     .single()
-  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
+  if (error) {
+    // Leaving `canceled` re-takes the stock via trigger and can hit products_stock_non_negative
+    if (error.code === '23514') {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Cannot reopen this order — its items are no longer in stock.',
+      })
+    }
+    throw createError({ statusCode: 500, statusMessage: error.message })
+  }
 
   // Fire-and-forget: a mail failure must never fail a status change that is already stored
   if (before.status !== body.status) {

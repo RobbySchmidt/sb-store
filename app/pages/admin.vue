@@ -60,12 +60,15 @@ const filtered = computed(() => {
 
 // ---- status change (optimistic) ----
 const saving = ref<string | null>(null)
+/** surfaced when a status change is rejected — e.g. reopening an order whose stock is gone */
+const statusError = ref<string | null>(null)
 async function setStatus(
   order: Order,
   status: OrderStatus,
   extra?: { reason: string | null; note: string | null },
 ) {
   if (order.status === status || saving.value) return
+  statusError.value = null
   const prev = { status: order.status, reason: order.cancel_reason, note: order.cancel_note }
 
   // the reason columns belong to a cancellation — any other status clears them, like the server does
@@ -81,10 +84,14 @@ async function setStatus(
       method: 'PATCH',
       body: extra ? { status, reason, note } : { status },
     })
-  } catch {
+  } catch (e: any) {
     order.status = prev.status
     order.cancel_reason = prev.reason
     order.cancel_note = prev.note
+    // e.data.statusMessage keeps the original text — e.statusMessage is the HTTP
+    // reason phrase, which h3 strips of non-ASCII
+    statusError.value = e?.data?.statusMessage ?? e?.data?.message
+      ?? `Could not update ${shortNo(order)}.`
     await refresh()
   } finally {
     saving.value = null
@@ -175,6 +182,22 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
     </section>
 
     <div class="relative mx-auto -mt-8 max-w-[1440px] px-5 md:px-6 lg:px-14">
+      <!-- ===== status change rejected (e.g. reopening an order whose stock is gone) ===== -->
+      <div
+        v-if="statusError"
+        class="card mb-4 flex items-start gap-3 border border-status-canceled/30 bg-status-canceled-bg px-5 py-4"
+      >
+        <Icon name="TriangleAlert" :size="18" :stroke-width="2" class="mt-0.5 shrink-0 text-status-canceled-text" />
+        <p class="grow text-sm text-status-canceled-text">{{ statusError }}</p>
+        <button
+          class="shrink-0 text-status-canceled-text transition-opacity hover:opacity-70"
+          aria-label="Dismiss"
+          @click="statusError = null"
+        >
+          <Icon name="X" :size="16" :stroke-width="2" />
+        </button>
+      </div>
+
       <!-- ===== toolbar ===== -->
       <div class="card flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-5 py-4" style="box-shadow: 0 14px 34px rgba(46,33,26,.12)">
         <!-- search first on tablet/mobile -->

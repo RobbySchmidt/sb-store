@@ -22,6 +22,7 @@ export interface Product {
   price_cents: number
   image_url: string | null
   is_active: boolean
+  stock: number
   meta: ProductMeta
   categories?: { name: string; slug: string } | null
 }

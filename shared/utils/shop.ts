@@ -5,6 +5,21 @@ export function fmtPrice(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`
 }
 
+export const LOW_STOCK_THRESHOLD = 5
+
+export type StockTone = 'out' | 'low' | 'ok'
+
+export function stockTone(stock: number): StockTone {
+  if (stock <= 0) return 'out'
+  return stock <= LOW_STOCK_THRESHOLD ? 'low' : 'ok'
+}
+
+/** Card/detail label: "OUT OF STOCK" · "ONLY 3 LEFT" · "12 LEFT" */
+export function stockLabel(stock: number): string {
+  if (stock <= 0) return 'OUT OF STOCK'
+  return stock <= LOW_STOCK_THRESHOLD ? `ONLY ${stock} LEFT` : `${stock} LEFT`
+}
+
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 function lastTuesday(from = new Date()): Date {
