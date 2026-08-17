@@ -162,7 +162,7 @@ Ember & Oak is a demo shop — no real order was placed and nothing will be ship
   return { subject, html, text }
 }
 
-export function sendOrderConfirmation(order: OrderEmailOrder) {
+export async function sendOrderConfirmation(order: OrderEmailOrder) {
   const { subject, html, text } = buildOrderConfirmation(order)
   return sendMail({ to: order.email, subject, html, text })
 }
