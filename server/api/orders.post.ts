@@ -76,5 +76,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: iErr.message })
   }
 
-  return { ...order, order_items: lines }
+  // Fire-and-forget: a mail failure must never fail an order that is already in the database
+  const full = { ...order, order_items: lines }
+  event.waitUntil(
+    sendOrderConfirmation(full).catch(err =>
+      console.error(`[mail] confirmation for ${order.order_number} failed:`, err),
+    ),
+  )
+
+  return full
 })
