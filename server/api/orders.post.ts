@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   // ---- price everything server-side from the live catalog ----
   const ids = items.map(i => i.productId)
   const { data: products, error: pErr } = await db
-    .from('products').select('id, name, price_cents, stock').in('id', ids)
+    .from('products').select('id, name, price_cents, stock, slug, image_url').in('id', ids)
   if (pErr) throw createError({ statusCode: 500, statusMessage: pErr.message })
   if (!products || products.length !== new Set(ids).size) {
     throw createError({ statusCode: 400, statusMessage: 'Unknown product in cart' })
@@ -105,8 +105,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: iErr.message })
   }
 
+  // Display-only catalog fields for the confirmation page's thumbnails and links.
+  // Deliberately NOT part of `lines` above — order_items has no such columns, and
+  // name/price stay snapshotted because they are record data. Shaped like the
+  // PostgREST join in /api/account/orders so both pages render the same way.
+  const displayLines = lines.map((l) => {
+    const p = products.find(x => x.id === l.product_id)!
+    return { ...l, products: { slug: p.slug, image_url: p.image_url } }
+  })
+
   // Fire-and-forget: a mail failure must never fail an order that is already in the database
-  const full = { ...order, order_items: lines }
+  const full = { ...order, order_items: displayLines }
   event.waitUntil(
     sendOrderConfirmation(full).catch(err =>
       console.error(`[mail] confirmation for ${order.order_number} failed:`, err),

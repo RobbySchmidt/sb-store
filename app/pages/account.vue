@@ -66,16 +66,43 @@ async function signOut() {
           </span>
         </div>
 
-        <ul class="mt-4 space-y-1.5 border-t border-line pt-4">
+        <ul class="mt-4 space-y-2.5 border-t border-line pt-4">
           <li
             v-for="item in order.order_items"
             :key="item.id"
-            class="flex justify-between gap-4 text-[14px]"
+            class="flex items-center gap-3.5 text-[14px]"
           >
-            <span>{{ item.quantity }} × {{ item.product_name }}</span>
+            <!-- products is a live join — absent once the product is deleted, so
+                 the line quietly falls back to text only -->
+            <NuxtLink
+              v-if="item.products?.slug"
+              :to="`/products/${item.products.slug}`"
+              class="h-[46px] w-[46px] shrink-0 overflow-hidden rounded-lg bg-cream-alt"
+            >
+              <img
+                v-if="item.products.image_url"
+                :src="item.products.image_url"
+                :alt="item.product_name"
+                class="h-full w-full object-cover"
+              >
+            </NuxtLink>
+            <span class="grow">
+              {{ item.quantity }} ×
+              <NuxtLink
+                v-if="item.products?.slug"
+                :to="`/products/${item.products.slug}`"
+                class="transition-colors hover:text-terra"
+              >{{ item.product_name }}</NuxtLink>
+              <template v-else>{{ item.product_name }}</template>
+            </span>
             <span class="shrink-0 text-muted">{{ fmtPrice(item.quantity * item.unit_price_cents) }}</span>
           </li>
         </ul>
+
+        <!-- shipped orders get an arrival estimate, counted from when it was marked -->
+        <p v-if="order.status === 'marked'" class="mt-4 text-[13px] text-status-marked-text">
+          Estimated delivery {{ deliveryWindow(order.updated_at) }}
+        </p>
 
         <div class="mt-4 flex justify-between border-t border-line pt-3.5 text-[15px] font-semibold">
           <span>Total</span>

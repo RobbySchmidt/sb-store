@@ -1,7 +1,9 @@
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event)
   const db = supabaseAdmin()
-  const select = '*, order_items(*)'
+  // products(...) is a live join for thumbnails and links only — name and price
+  // stay snapshotted on order_items. Null when the product was since deleted.
+  const select = '*, order_items(*, products(slug, image_url))'
 
   // Two queries rather than one PostgREST .or(): that filter is built by
   // string concatenation, so an email containing a comma or a parenthesis
