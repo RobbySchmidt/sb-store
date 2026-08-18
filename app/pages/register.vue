@@ -1,22 +1,15 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient()
-const user = useSupabaseUser()
 const { loadFor, landingPath } = useProfile()
 
+// already signed in? the middleware bounces to /admin or /account before paint
+definePageMeta({ middleware: 'redirect-if-signed-in' })
 useHead({ title: 'Create account — Ember & Oak' })
 
 const email = ref('')
 const password = ref('')
 const error = ref<string | null>(null)
 const busy = ref(false)
-
-// `sub`, not `id` — useSupabaseUser() returns JWT claims
-onMounted(async () => {
-  if (user.value) {
-    await loadFor(user.value.sub)
-    await navigateTo(landingPath.value)
-  }
-})
 
 async function submit() {
   if (busy.value) return
