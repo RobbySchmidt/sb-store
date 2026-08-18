@@ -1,4 +1,6 @@
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
+
   const db = supabaseAdmin()
   const { data, error } = await db
     .from('orders')

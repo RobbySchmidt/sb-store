@@ -51,7 +51,29 @@ useHead({ title: 'Order confirmed — Ember & Oak' })
         <h2 class="font-display text-[20px] font-semibold">Your items</h2>
         <div class="mt-4 divide-y divide-line">
           <div v-for="(item, i) in order.order_items" :key="i" class="flex items-center gap-4 py-3.5">
-            <p class="grow text-sm font-medium">{{ item.product_name }} × {{ item.quantity }}</p>
+            <!-- products is a live join — absent once the product is deleted, so
+                 the line quietly falls back to text only -->
+            <NuxtLink
+              v-if="item.products?.slug"
+              :to="`/products/${item.products.slug}`"
+              class="h-[46px] w-[46px] shrink-0 overflow-hidden rounded-lg bg-cream-alt"
+            >
+              <img
+                v-if="item.products.image_url"
+                :src="item.products.image_url"
+                :alt="item.product_name"
+                class="h-full w-full object-cover"
+              >
+            </NuxtLink>
+            <p class="grow text-sm font-medium">
+              <NuxtLink
+                v-if="item.products?.slug"
+                :to="`/products/${item.products.slug}`"
+                class="transition-colors hover:text-terra"
+              >{{ item.product_name }}</NuxtLink>
+              <span v-else>{{ item.product_name }}</span>
+              × {{ item.quantity }}
+            </p>
             <span class="text-sm font-semibold">{{ fmtPrice(item.unit_price_cents * item.quantity) }}</span>
           </div>
         </div>

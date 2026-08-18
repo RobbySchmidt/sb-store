@@ -7,6 +7,8 @@ const VALID_STATUSES = ['open', 'marked', 'canceled'] as const
 const NOTE_MAX = 500
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
+
   const id = getRouterParam(event, 'id')
   const body = await readBody<{ status?: string; reason?: string | null; note?: string | null }>(event)
 

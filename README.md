@@ -36,6 +36,25 @@ container and need no changes. The database itself is hosted at Supabase, so
 both machines share the same data — no migration or seeding needed on the
 second machine.
 
+## Accounts
+
+The store has email/password accounts with two roles.
+
+- Register at `/register`. Signing up with **schmidt@rhowerk.de** automatically
+  gets the `admin` role — the address is baked into the signup trigger in
+  `supabase/migration-005-auth-and-roles.sql`. Everyone else becomes a
+  `customer`.
+- Admins land on `/admin` after signing in, customers on `/account`, which
+  lists their own orders.
+- Buying does **not** require an account — guest checkout still works. An order
+  placed as a guest shows up on an account later if the email matches.
+- Signup email confirmation is **off**: Supabase dashboard → Authentication →
+  Providers → Email → *Confirm email*. Supabase is hosted, so its auth mails
+  could not reach the local Mailpit container anyway.
+
+Both of those are settings on the shared hosted Supabase project, so **none of
+this needs redoing on the second machine**, and no new `.env` keys are involved.
+
 ## Setup
 
 Make sure to install dependencies:

@@ -44,6 +44,9 @@ export interface OrderItem {
   product_name: string
   unit_price_cents: number
   quantity: number
+  /** Live catalog join, for the thumbnail and the link only. Null once the
+   *  product is deleted — name and price stay snapshotted on the row above. */
+  products?: { slug: string; image_url: string | null } | null
 }
 
 export interface Order {
@@ -56,11 +59,24 @@ export interface Order {
   zip: string
   city: string
   country: string
+  user_id: string | null
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
   cancel_reason: string | null
   cancel_note: string | null
   created_at: string
+  /** Bumped by the orders_set_updated_at trigger, so in practice this is when
+   *  the status last changed — what the shipped delivery estimate counts from. */
+  updated_at: string
   order_items: OrderItem[]
+}
+
+export type UserRole = 'customer' | 'admin'
+
+export interface Profile {
+  id: string
+  email: string
+  role: UserRole
+  created_at: string
 }

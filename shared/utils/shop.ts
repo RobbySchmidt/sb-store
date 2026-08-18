@@ -5,6 +5,17 @@ export function fmtPrice(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`
 }
 
+/**
+ * Customer-facing order status. Deliberately different wording from the
+ * admin dashboard's STATUS map — it reuses the language the customer has
+ * already been sent by mail ("confirmed", "on its way").
+ */
+export function customerOrderStatus(status: 'open' | 'marked' | 'canceled'): string {
+  if (status === 'marked') return 'On its way'
+  if (status === 'canceled') return 'Canceled'
+  return 'Confirmed'
+}
+
 export const LOW_STOCK_THRESHOLD = 5
 
 export type StockTone = 'out' | 'low' | 'ok'
@@ -59,4 +70,25 @@ export function batchInfo(now = new Date()) {
     nextRoastHuman: `Tuesday, ${human(upcoming)}`,  // Tuesday, Aug 18
     deliveryHuman: `Thu–Fri, ${human(delivStart)}–${delivEnd.getDate()}`,
   }
+}
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+/**
+ * Delivery window for an order that has already shipped: the 2–3 days after
+ * `from`. "Thu–Fri, Aug 27–28", or "Sun–Mon, Aug 31–Sep 1" across a month end.
+ *
+ * batchInfo() can hardcode Thu–Fri because roasting is always a Tuesday. A
+ * shipment can leave on any weekday, so the day names are computed here.
+ */
+export function deliveryWindow(from: Date | string): string {
+  const d = new Date(from)
+  const start = new Date(d)
+  start.setDate(d.getDate() + 2)
+  const end = new Date(d)
+  end.setDate(d.getDate() + 3)
+  const tail = start.getMonth() === end.getMonth()
+    ? `${end.getDate()}`
+    : `${MONTHS[end.getMonth()]} ${end.getDate()}`
+  return `${DAYS[start.getDay()]}–${DAYS[end.getDay()]}, ${MONTHS[start.getMonth()]} ${start.getDate()}–${tail}`
 }

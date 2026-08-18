@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import type { Order, OrderStatus } from '~/types/shop'
 
-definePageMeta({ layout: false })
+definePageMeta({ layout: false, middleware: 'admin' })
 
 // deep: true — Nuxt 4 defaults useFetch data to a shallowRef, which would not
 // react to the optimistic `order.status = …` mutation in setStatus() below
 const { data: ordersData, refresh } = await useFetch<Order[]>('/api/admin/orders', { deep: true })
 const orders = computed(() => ordersData.value ?? [])
+
+const supabase = useSupabaseClient()
+const { profile } = useProfile()
+
+async function signOut() {
+  await supabase.auth.signOut()
+  profile.value = null
+  await navigateTo('/')
+}
 
 const statusFilter = ref<'all' | OrderStatus>('all')
 const query = ref('')
@@ -156,9 +165,12 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
           <span class="text-sm font-medium text-[#EFE4D8]/85">Orders</span>
           <span class="mono-label rounded-full border border-[#EFE4D8]/32 px-2.5 py-1 text-[9px] font-semibold text-[#EFE4D8]/70">INTERNAL</span>
         </div>
-        <p class="mono-label text-[10px] text-[#EFE4D8]/55">
-          {{ todayLabel }} · {{ thisWeek.length }} ORDERS THIS WEEK
-        </p>
+        <div class="flex items-center gap-5">
+          <p class="mono-label text-[10px] text-[#EFE4D8]/55">
+            {{ todayLabel }} · {{ thisWeek.length }} ORDERS THIS WEEK
+          </p>
+          <button class="btn-ghost-dark h-9 px-5 text-sm" @click="signOut">Sign out</button>
+        </div>
       </div>
 
       <div class="relative mx-auto grid max-w-[1440px] grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-5 px-5 md:px-6 lg:px-14 pt-8">
