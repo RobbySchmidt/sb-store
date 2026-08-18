@@ -5,6 +5,17 @@ export function fmtPrice(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`
 }
 
+/**
+ * Customer-facing order status. Deliberately different wording from the
+ * admin dashboard's STATUS map — it reuses the language the customer has
+ * already been sent by mail ("confirmed", "on its way").
+ */
+export function customerOrderStatus(status: 'open' | 'marked' | 'canceled'): string {
+  if (status === 'marked') return 'On its way'
+  if (status === 'canceled') return 'Canceled'
+  return 'Confirmed'
+}
+
 export const LOW_STOCK_THRESHOLD = 5
 
 export type StockTone = 'out' | 'low' | 'ok'

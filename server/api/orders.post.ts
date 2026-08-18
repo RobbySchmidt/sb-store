@@ -34,6 +34,9 @@ export default defineEventHandler(async (event) => {
 
   const db = supabaseAdmin()
 
+  // Optional — guest checkout stays supported. currentUser() never throws.
+  const user = await currentUser(event)
+
   // ---- price everything server-side from the live catalog ----
   const ids = items.map(i => i.productId)
   const { data: products, error: pErr } = await db
@@ -78,6 +81,7 @@ export default defineEventHandler(async (event) => {
       zip: c.zip.trim(),
       city: c.city.trim(),
       country: c.country.trim(),
+      user_id: user?.id ?? null,
       subtotal_cents: subtotal,
       shipping_cents: shipping,
       total_cents: total,

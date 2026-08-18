@@ -56,6 +56,7 @@ export interface Order {
   zip: string
   city: string
   country: string
+  user_id: string | null
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
@@ -63,4 +64,13 @@ export interface Order {
   cancel_note: string | null
   created_at: string
   order_items: OrderItem[]
+}
+
+export type UserRole = 'customer' | 'admin'
+
+export interface Profile {
+  id: string
+  email: string
+  role: UserRole
+  created_at: string
 }

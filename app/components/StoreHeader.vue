@@ -4,6 +4,17 @@ const route = useRoute()
 const menuOpen = ref(false)
 const batch = batchInfo()
 
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
+const { profile, isAdmin } = useProfile()
+
+async function signOutFromMenu() {
+  menuOpen.value = false
+  await supabase.auth.signOut()
+  profile.value = null
+  await navigateTo('/')
+}
+
 const navLinks = [
   { label: 'Shop', to: '/shop' },
   { label: 'About', to: '#' },
@@ -72,6 +83,7 @@ function openCartFromMenu() {
         >
           {{ link.label }}
         </NuxtLink>
+        <AccountMenu />
         <button
           class="flex items-center gap-2.5 rounded-full border border-[#EFE4D8]/32 px-[17px] py-[9px] text-sm font-medium text-[#EFE4D8] transition-colors hover:border-ember hover:text-ember"
           @click="cart.drawerOpen = true"
@@ -155,6 +167,19 @@ function openCartFromMenu() {
             >
               {{ link.label }}
             </NuxtLink>
+          </div>
+
+          <p class="mono-label mt-10 text-[10px] font-medium text-[#EFE4D8]/50">ACCOUNT</p>
+          <div class="mt-3 flex flex-col items-start">
+            <template v-if="user">
+              <NuxtLink to="/account" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">My orders</NuxtLink>
+              <NuxtLink v-if="isAdmin" to="/admin" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">Admin dashboard</NuxtLink>
+              <button class="py-2 text-[17px] font-medium text-[#EFE4D8]/85" @click="signOutFromMenu">Sign out</button>
+            </template>
+            <template v-else>
+              <NuxtLink to="/login" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">Log in</NuxtLink>
+              <NuxtLink to="/register" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">Create account</NuxtLink>
+            </template>
           </div>
         </nav>
 

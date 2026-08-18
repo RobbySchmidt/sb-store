@@ -20,17 +20,18 @@ project, not a real shop.
 - **Data:** catalog and orders live in Supabase. The SQL files in `supabase/`
   are run **by hand** in the Supabase SQL editor, in order: `schema.sql`,
   `migration-002-meta-and-orders.sql`, `migration-003-cancel-reason.sql`,
-  `migration-004-stock.sql`. **All four are already applied** to the live
-  project — never re-run them; 004's seed section would reset every product's
-  stock. The catalog is publicly readable via RLS; orders are reachable only
-  through the service-role key in Nitro server routes.
+  `migration-004-stock.sql`, `migration-005-auth-and-roles.sql`. **All five
+  are already applied** to the live project — never re-run them; 004's seed
+  section would reset every product's stock. The catalog is publicly readable
+  via RLS; orders are reachable only through the service-role key in Nitro
+  server routes.
 - **Order flow:** `app/pages/checkout.vue` → `server/api/orders.post.ts` (prices
   the cart server-side from the live catalog, checks stock, inserts order +
   items, fires the confirmation email) → `app/pages/confirmation.vue`.
 - **Admin:** `app/pages/admin.vue` lists orders and changes their status via
   `server/api/admin/orders/[id].patch.ts`, which emails the customer on a real
-  status change. These routes have **no authentication** — a known, accepted
-  gap for a localhost project.
+  status change. These routes are guarded by `requireAdmin()` from
+  `server/utils/auth.ts`.
 
 ## Stock — read before touching orders
 
@@ -66,6 +67,33 @@ http://localhost:8025). See the README's "Local mail" section.
   see. This was a real bug once.
 - `/api/dev/preview-mail?template=confirmation|shipped|canceled` renders a
   template in the browser (dev only, 404s in production).
+
+## Auth and roles
+
+Email/password through `@nuxtjs/supabase`. Roles live in `public.profiles`
+(`migration-005-auth-and-roles.sql`), created by a trigger on `auth.users`
+insert that assigns `admin` to `schmidt@rhowerk.de` and `customer` to everyone
+else.
+
+- `server/utils/auth.ts` — `currentUser()` (never throws, for guest checkout),
+  `requireUser()` (401), `requireAdmin()` (403). **This is the only gate.**
+  `useProfile()` on the client decides what to render, never what is allowed.
+- **`serverSupabaseUser()` and `useSupabaseUser()` return JWT *claims*, not a
+  user row.** The id is `sub`, not `id` — and because `JwtPayload` has an index
+  signature, `user.id` compiles fine and is `undefined` at runtime. This cost
+  real time twice. `server/utils/auth.ts` maps claims to a narrow
+  `SessionUser { id, email }`; in `app/` use `user.value.sub`. The exception:
+  `data.user` from `signInWithPassword()`/`signUp()` is a real `User` and does
+  have `.id`.
+- Guest checkout still works. `orders.user_id` is stamped when a signed-in
+  person checks out; `/api/account/orders` also falls back to matching the
+  account email, so guest orders surface once you register with that address.
+- **Signup email confirmation is off** (Supabase dashboard setting). That makes
+  the email fallback trust-on-assertion — registering as someone else's address
+  would show their orders. Accepted for a fake localhost shop; turning
+  confirmation on closes it with no code change.
+- Supabase is hosted, so its auth mails can never reach the local Mailpit
+  container. Only the order mails in `server/utils/email/` go through Mailpit.
 
 ## Conventions
 
