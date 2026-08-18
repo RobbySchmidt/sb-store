@@ -1,7 +1,5 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
-const { profile, isAdmin } = useProfile()
+const { profile, isAdmin, signOut } = useProfile()
 const route = useRoute()
 
 const open = ref(false)
@@ -24,11 +22,9 @@ onUnmounted(() => {
   document.removeEventListener('keydown', onKey)
 })
 
-async function signOut() {
+async function signOutFromMenu() {
   open.value = false
-  await supabase.auth.signOut()
-  profile.value = null
-  await navigateTo('/')
+  await signOut()
 }
 
 const itemClass =
@@ -52,14 +48,14 @@ const itemClass =
         v-if="open"
         class="absolute right-0 top-[calc(100%+8px)] z-50 w-[236px] overflow-hidden rounded-xl border border-line bg-white py-1.5 shadow-lg"
       >
-        <template v-if="user">
+        <template v-if="profile">
           <p class="truncate border-b border-line px-4 pb-2.5 pt-1.5 text-[13px] text-muted">
-            {{ user.email }}
+            {{ profile.email }}
           </p>
           <NuxtLink to="/account" :class="itemClass">My orders</NuxtLink>
           <NuxtLink v-if="isAdmin" to="/admin" :class="itemClass">Admin dashboard</NuxtLink>
           <div class="my-1.5 border-t border-line" />
-          <button :class="itemClass" @click="signOut">Sign out</button>
+          <button :class="itemClass" @click="signOutFromMenu">Sign out</button>
         </template>
 
         <template v-else>

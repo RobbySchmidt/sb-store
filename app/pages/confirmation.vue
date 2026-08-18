@@ -3,6 +3,7 @@ definePageMeta({ layout: false })
 
 const cart = useCartStore()
 const batch = batchInfo()
+const img = useAssetUrl()
 
 const order = computed(() => cart.lastOrder)
 
@@ -50,25 +51,25 @@ useHead({ title: 'Order confirmed — Ember & Oak' })
       <div class="card p-6 md:p-7" style="box-shadow: var(--shadow-card-ondark)">
         <h2 class="font-display text-[20px] font-semibold">Your items</h2>
         <div class="mt-4 divide-y divide-line">
-          <div v-for="(item, i) in order.order_items" :key="i" class="flex items-center gap-4 py-3.5">
-            <!-- products is a live join — absent once the product is deleted, so
-                 the line quietly falls back to text only -->
+          <div v-for="(item, i) in order.items" :key="i" class="flex items-center gap-4 py-3.5">
+            <!-- product is a live relation — absent once the product is deleted,
+                 so the line quietly falls back to text only -->
             <NuxtLink
-              v-if="item.products?.slug"
-              :to="`/products/${item.products.slug}`"
+              v-if="item.product?.slug"
+              :to="`/products/${item.product.slug}`"
               class="h-[46px] w-[46px] shrink-0 overflow-hidden rounded-lg bg-cream-alt"
             >
               <img
-                v-if="item.products.image_url"
-                :src="item.products.image_url"
+                v-if="item.product.image"
+                :src="img(item.product.image, THUMB) ?? undefined"
                 :alt="item.product_name"
                 class="h-full w-full object-cover"
               >
             </NuxtLink>
             <p class="grow text-sm font-medium">
               <NuxtLink
-                v-if="item.products?.slug"
-                :to="`/products/${item.products.slug}`"
+                v-if="item.product?.slug"
+                :to="`/products/${item.product.slug}`"
                 class="transition-colors hover:text-terra"
               >{{ item.product_name }}</NuxtLink>
               <span v-else>{{ item.product_name }}</span>

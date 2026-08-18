@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Order } from '~/types/shop'
+import type { EoOrder } from '~~/shared/types/directus'
 
-const props = defineProps<{ order: Order }>()
+const props = defineProps<{ order: Pick<EoOrder, 'order_number' | 'customer_name'> }>()
 
 const emit = defineEmits<{
   confirm: [payload: { reason: string | null; note: string | null }]

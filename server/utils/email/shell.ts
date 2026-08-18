@@ -17,7 +17,7 @@ export interface OrderEmailOrder {
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
-  order_items: OrderEmailItem[]
+  items: OrderEmailItem[]
   cancel_reason?: string | null
   cancel_note?: string | null
 }
@@ -125,7 +125,7 @@ function totalRow(label: string, value: string, strong = false): string {
 
 /** The white card listing every line item, followed by the totals rows. */
 export function itemsSection(order: OrderEmailOrder, opts: TotalsOptions = {}): string {
-  const itemRows = order.order_items.map(item => `
+  const itemRows = order.items.map(item => `
         <tr>
           <td style="padding:12px 0;border-bottom:1px solid ${LINE};font-size:14px;color:${ESPRESSO};">
             ${esc(item.product_name)} × ${item.quantity}
@@ -214,7 +214,7 @@ Ember & Oak is a demo shop — no real order was placed and nothing will be ship
 }
 
 export function itemLinesText(order: OrderEmailOrder): string {
-  return order.order_items
+  return order.items
     .map(item => `  ${item.product_name} × ${item.quantity}   ${fmtPrice(item.unit_price_cents * item.quantity)}`)
     .join('\n')
 }

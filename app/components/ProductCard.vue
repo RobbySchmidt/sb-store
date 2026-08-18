@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { Product } from '~/types/shop'
+import type { CatalogProduct } from '~/composables/useShop'
 
 const props = defineProps<{
-  product: Product
+  product: CatalogProduct
   /** stronger shadow when the card overlaps the dark band */
   onDark?: boolean
 }>()
 
 const cart = useCartStore()
-const badge = computed(() => badgeLabel(props.product.categories?.slug))
+const img = useAssetUrl()
+const badge = computed(() => badgeLabel(props.product.category.slug))
 
 const STOCK_TONE_CLASS: Record<'out' | 'low' | 'ok', string> = {
   out: 'text-status-canceled',
@@ -17,8 +18,8 @@ const STOCK_TONE_CLASS: Record<'out' | 'low' | 'ok', string> = {
   ok: 'text-muted',
 }
 
-const soldOut = computed(() => props.product.stock <= 0)
-const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock)])
+const soldOut = computed(() => props.product.stock_available <= 0)
+const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock_available)])
 </script>
 
 <template>
@@ -29,8 +30,8 @@ const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock
   >
     <div class="relative aspect-square overflow-hidden bg-cream-alt">
       <img
-        v-if="product.image_url"
-        :src="product.image_url"
+        v-if="product.image"
+        :src="img(product.image, { width: 640, height: 640, fit: 'cover', format: 'webp' }) ?? undefined"
         :alt="product.name"
         class="h-full w-full object-cover"
         loading="lazy"
@@ -56,13 +57,13 @@ const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock
           <div>
             <span class="text-[17px] font-semibold">{{ fmtPrice(product.price_cents) }}</span>
             <p class="mono-label mt-1 text-[10px] font-semibold" :class="stockClass">
-              {{ stockLabel(product.stock) }}
+              {{ stockLabel(product.stock_available) }}
             </p>
           </div>
           <button
             class="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-espresso text-white transition-colors hover:bg-terra disabled:opacity-40 disabled:hover:bg-espresso"
             :aria-label="`Add ${product.name} to cart`"
-            :disabled="product.stock <= 0"
+            :disabled="product.stock_available <= 0"
             @click.prevent.stop="cart.add(product)"
           >
             <Icon name="Plus" :size="19" :stroke-width="2.5" />
@@ -72,11 +73,11 @@ const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(props.product.stock
         <div class="md:hidden">
           <span class="text-base font-semibold">{{ fmtPrice(product.price_cents) }}</span>
           <p class="mono-label mt-1 text-[10px] font-semibold" :class="stockClass">
-            {{ stockLabel(product.stock) }}
+            {{ stockLabel(product.stock_available) }}
           </p>
           <button
             class="mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-[10px] bg-espresso text-sm font-semibold text-white transition-colors active:bg-terra disabled:opacity-40"
-            :disabled="product.stock <= 0"
+            :disabled="product.stock_available <= 0"
             @click.prevent.stop="cart.add(product)"
           >
             <Icon name="Plus" :size="16" :stroke-width="2.5" />

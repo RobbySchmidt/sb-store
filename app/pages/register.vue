@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient()
-const { loadFor, landingPath } = useProfile()
+const { profile, landingPath } = useProfile()
 
 // already signed in? the middleware bounces to /admin or /account before paint
 definePageMeta({ middleware: 'redirect-if-signed-in' })
@@ -15,28 +14,27 @@ async function submit() {
   if (busy.value) return
   error.value = null
 
-  if (password.value.length < 6) {
-    error.value = 'Password must be at least 6 characters.'
+  // mirrors the server's rule, so the obvious case never costs a round trip
+  if (password.value.length < 8) {
+    error.value = 'Password must be at least 8 characters.'
     return
   }
 
   busy.value = true
-  // Confirm-email is off on this project, so signUp returns a live session
-  // and we can route straight on. Same SDK error shape as login.
-  const { data, error: authError } = await supabase.auth.signUp({
-    email: email.value.trim(),
-    password: password.value,
-  })
-  busy.value = false
-
-  if (authError || !data.user) {
-    error.value = authError?.message ?? 'Could not create your account.'
-    return
+  try {
+    // /api/auth/register signs the new account straight in, so we can route on
+    profile.value = await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: { email: email.value.trim(), password: password.value },
+    })
+    await navigateTo(landingPath.value)
+  } catch (e: any) {
+    // e.data.statusMessage keeps the original text — e.statusMessage is the
+    // HTTP reason phrase, which h3 strips of non-ASCII
+    error.value = e?.data?.statusMessage ?? e?.data?.message ?? 'Could not create your account.'
+  } finally {
+    busy.value = false
   }
-
-  // data.user is a real User from the auth SDK — .id is correct here
-  await loadFor(data.user.id)
-  await navigateTo(landingPath.value)
 }
 
 const inputClass =
@@ -58,7 +56,7 @@ const inputClass =
         <div>
           <label class="mono-label mb-2 block text-[10px] font-medium text-muted" for="password">PASSWORD</label>
           <input id="password" v-model="password" type="password" autocomplete="new-password" :class="inputClass">
-          <p class="mt-1.5 text-[13px] text-muted">At least 6 characters.</p>
+          <p class="mt-1.5 text-[13px] text-muted">At least 8 characters.</p>
         </div>
 
         <p v-if="error" class="text-[13px] text-status-canceled">{{ error }}</p>

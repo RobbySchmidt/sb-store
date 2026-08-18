@@ -14,7 +14,7 @@ const SAMPLE: OrderEmailOrder = {
   subtotal_cents: 4680,
   shipping_cents: 490,
   total_cents: 5170,
-  order_items: [
+  items: [
     { product_name: 'Ember Blend – Dark Roast 250g', unit_price_cents: 1490, quantity: 1 },
     { product_name: 'Sunrise Single Origin – Ethiopia 250g', unit_price_cents: 1650, quantity: 1 },
     { product_name: 'Honey Almond Granola 500g', unit_price_cents: 850, quantity: 1 },

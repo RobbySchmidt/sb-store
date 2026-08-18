@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const img = useAssetUrl()
 const cart = useCartStore()
 const { data: catalog } = await useCatalog()
 
@@ -13,7 +14,7 @@ if (!product.value) {
 const qty = ref(1)
 watch(() => route.params.slug, () => { qty.value = 1 })
 
-const stock = computed(() => product.value?.stock ?? 0)
+const stock = computed(() => product.value?.stock_available ?? 0)
 const soldOut = computed(() => stock.value <= 0)
 
 /** keep qty inside 1…stock whenever the product (and therefore the stock) changes */
@@ -38,7 +39,7 @@ const STOCK_TONE_CLASS_ONDARK: Record<'out' | 'low' | 'ok', string> = {
 const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(stock.value)])
 const stockClassOnDark = computed(() => STOCK_TONE_CLASS_ONDARK[stockTone(stock.value)])
 
-const badge = computed(() => badgeLabel(product.value?.categories?.slug))
+const badge = computed(() => badgeLabel(product.value?.category.slug))
 const meta = computed(() => product.value?.meta ?? {})
 
 const perKg = computed(() => {
@@ -52,8 +53,8 @@ const lineTotal = computed(() => (product.value?.price_cents ?? 0) * qty.value)
 const related = computed(() => {
   if (!product.value) return []
   const p = product.value
-  const same = products.value.filter(x => x.id !== p.id && x.category_id === p.category_id)
-  const rest = products.value.filter(x => x.id !== p.id && x.category_id !== p.category_id)
+  const same = products.value.filter(x => x.id !== p.id && x.category.id === p.category.id)
+  const rest = products.value.filter(x => x.id !== p.id && x.category.id !== p.category.id)
   return [...same, ...rest].slice(0, 3)
 })
 
@@ -80,8 +81,8 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
           <div>
             <div class="aspect-square overflow-hidden rounded-[14px] bg-[#3B2A21]" style="box-shadow: var(--shadow-hero)">
               <img
-                v-if="product.image_url"
-                :src="product.image_url"
+                v-if="product.image"
+                :src="img(product.image, { width: 1200, height: 1200, fit: 'cover', format: 'webp' }) ?? undefined"
                 :alt="product.name"
                 class="h-full w-full object-cover"
               >
@@ -143,7 +144,7 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
             <div class="mt-7 flex flex-col md:flex-row gap-3.5 md:items-center">
               <div class="flex items-center gap-3">
                 <span class="mono-label text-[10px] font-medium text-muted md:hidden">QTY</span>
-                <QtyStepper v-model="qty" :size="44" :max="Math.max(1, product.stock)" />
+                <QtyStepper v-model="qty" :size="44" :max="Math.max(1, stock)" />
               </div>
               <button
                 class="btn-primary w-full md:grow disabled:opacity-40 disabled:hover:bg-terra"
@@ -186,7 +187,7 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
           class="flex items-center gap-4 py-3.5"
         >
           <div class="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg bg-cream-alt">
-            <img v-if="p.image_url" :src="p.image_url" :alt="p.name" class="h-full w-full object-cover">
+            <img v-if="p.image" :src="img(p.image, { width: 144, height: 144, fit: 'cover', format: 'webp' }) ?? undefined" :alt="p.name" class="h-full w-full object-cover">
           </div>
           <div class="grow">
             <p class="font-display text-[15px] font-semibold leading-snug">{{ p.name }}</p>

@@ -7,10 +7,12 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "directus:setup": "node --env-file=.env directus/setup.ts",
+    "directus:seed": "node --env-file=.env directus/seed.ts"
   },
   "dependencies": {
-    "@nuxtjs/supabase": "2.0.10",
+    "@directus/sdk": "^24.0.0",
     "@pinia/nuxt": "1.0.2",
     "@tailwindcss/vite": "^4.3.3",
     "lucide-vue-next": "^1.0.0",

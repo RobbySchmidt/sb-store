@@ -112,6 +112,7 @@ with `cascade_*`.
 | `subtotal_cents`, `shipping_cents`, `total_cents` | integer | required, `>= 0` |
 | `cancel_reason`, `cancel_note` | string / text | nullable |
 | `user` | m2o → `directus_users` | nullable, **on delete SET NULL** |
+| `items` | o2m ← `eo_order_items.order` | alias field; the o2m side of the line relation |
 | `date_created`, `date_updated` | timestamp | Directus special fields |
 
 ### `eo_order_items`
@@ -167,6 +168,10 @@ GET /items/eo_order_items
     &groupBy=product
     &filter[order][status][_neq]=canceled
 ```
+
+`/api/catalog` attaches the result to each product as **`stock_available`** — a
+computed number, not a stored column. `stock_initial` is the only stock value
+that exists in the database, which is what makes the whole thing safe.
 
 ### Consequences
 
@@ -278,38 +283,58 @@ Accepted for a fake shop, same as today.
 
 ## 5. Route and component inventory
 
-### The API boundary keeps today's shapes
+### Directus vocabulary reaches the client — no translation shim
 
-Directus's field vocabulary differs from the app's: `category` vs
-`category_id`, `image` vs `image_url`, `date_created` vs `created_at`,
-`date_updated` vs `updated_at`, `user` vs `user_id`, `product` vs `product_id`.
+An earlier draft had Nitro renaming Directus's fields back to the PostgREST
+names the app uses today (`date_created` → `created_at`, `image` → `image_url`,
+`product` → `product_id`, and a nested key called `products` holding a single
+object). That was rejected: it is a **permanent** translation layer whose only
+purpose is avoiding a **one-time** rename, and it would leave the app speaking a
+vocabulary no part of the stack uses any more.
 
-**Nitro maps back to the current shapes rather than letting Directus's naming
-reach the client.** `app/types/shop.ts` is unchanged, and a small mapping layer
-in `server/utils/` (`toProduct()`, `toOrder()`) is the only thing that speaks
-Directus vocabulary.
+The app uses Directus's names.
 
-This is what keeps the migration a server-side change. Specifically:
+| today | after |
+|---|---|
+| `products.image_url` (absolute URL) | `image` (file id) + `assetUrl()` |
+| `products.category_id`, nested `categories` | `category` (expandable) |
+| `products.stock` | `stock_available` (computed, see §3) |
+| `orders.created_at` / `updated_at` | `date_created` / `date_updated` |
+| `orders.user_id` | `user` |
+| `orders.order_items[]` | `orders.items[]` (o2m alias) |
+| `order_items.product_id`, nested `products` | `product` (expandable) |
 
-- **`Product.stock` stays a number** — now the derived available count. Every
-  badge keeps working, and `stockTone()` / `stockLabel()` /
-  `LOW_STOCK_THRESHOLD` in `shared/utils/shop.ts` need no changes at all.
-- **`Product.image_url` stays a string**, now `${DIRECTUS_URL}/assets/<file-id>`.
-  No template touches a file object.
-- **`OrderItem.products` keeps its odd plural name** — it is the PostgREST join
-  shape, and every thumbnail and link in `account.vue`, `confirmation.vue` and
-  the mail templates is already written against it, behind
-  `v-if="item.products?.slug"`. Renaming it would buy nothing and touch a dozen
-  files.
-- **All three email templates are untouched**, because they read
-  `order.order_items[].product_name`, `created_at` and friends.
-- `Order.updated_at` keeps its meaning — Directus's `date_updated` special field
-  does what `orders_set_updated_at` did, so the shipped-delivery estimate still
-  counts from the last status change.
+### Types come from a Directus schema, not by hand
 
-The cost is one well-bounded mapping module. The alternative — renaming through
-`app/`, `shared/` and the mail templates — spreads the migration across the
-whole codebase for no benefit.
+`shared/types/directus.ts` declares one interface per collection plus the
+`Schema` type that parameterises `@directus/sdk`. Server queries are typed
+end-to-end from it, and `app/` imports the same interfaces for route response
+shapes. This replaces both hand-written `app/types/shop.ts` model types **and**
+the generated `app/types/database.types.ts` we are deleting — so the
+regeneration step in Conventions goes away rather than being replaced by another
+one.
+
+`app/types/shop.ts` keeps only genuinely client-side view models: `CartItem`,
+`ProductMeta`.
+
+### Images use asset transformations
+
+`assetUrl(id, { width, format })` in `shared/utils/` builds
+`${DIRECTUS_URL}/assets/<id>?…`. Product cards request a sized `webp` rather
+than the full-resolution original, which the Supabase Storage absolute URLs
+could not do. `BrandMark.vue`'s hardcoded Supabase URL becomes a call to it.
+
+### What this costs, and how it is caught
+
+Mechanical renames across roughly a dozen `.vue` files and the three mail
+templates. **There is no test suite to catch a missed rename, and neither
+`yarn dev` nor `yarn build` typechecks** — so the pinned `vue-tsc` command in
+Conventions is not optional here, it is the safety net. It runs after the rename
+pass and again at the end (see §9).
+
+`shared/utils/shop.ts` still needs no changes: `stockTone()`, `stockLabel()` and
+`LOW_STOCK_THRESHOLD` are pure functions of a number, and `stock_available` is a
+number.
 
 ### New
 
@@ -345,9 +370,29 @@ server-only, and one place knows how to compute availability.
 - `app/pages/{login,register,account,admin}.vue`,
   `app/components/{AccountMenu,StoreHeader}.vue` — sign-out posts to
   `/api/auth/logout`
-- `app/components/BrandMark.vue` — hardcoded Supabase Storage URL becomes a
-  Directus asset URL
+- `app/components/BrandMark.vue` — hardcoded Supabase Storage URL becomes an
+  `assetUrl()` call
 - `nuxt.config.ts` — drop the `@nuxtjs/supabase` module and its `supabase` block
+
+Touched by the rename pass only, since Directus names now reach the client:
+
+- `app/pages/{index,shop,cart,checkout,confirmation}.vue`,
+  `app/pages/products/[slug].vue`, `app/components/ProductCard.vue`
+- `server/utils/email/{confirmation,shipped,canceled}.ts` — field names only;
+  the shared chrome in `shell.ts` is untouched
+- `app/types/shop.ts` — reduced to `CartItem` and `ProductMeta`
+
+### New files
+
+- `shared/types/directus.ts` — collection interfaces + the `Schema` type
+- `shared/utils/assetUrl.ts` — builds `/assets/<id>?width=…&format=webp`
+- `server/utils/directus.ts` — the SDK client on the static token
+- `server/utils/stock.ts` — the availability aggregate and the checkout lock
+- `directus/setup.ts` — the idempotent schema + seed script
+
+> Editing `shared/` needs a dev-server restart. Nuxt's auto-import watcher only
+> watches paths under `app/`, so new exports there are invisible to a running
+> dev server.
 
 ### Deleted
 
@@ -360,16 +405,13 @@ the only written record of the old system — and is removed in a follow-up.
 
 ### Unchanged
 
-- `server/utils/mailer.ts` and all of `server/utils/email/`. The templates take
-  an order object and are unaffected by where it came from. Sends stay
+- `server/utils/mailer.ts` and `server/utils/email/shell.ts`. Sends stay
   fire-and-forget via `event.waitUntil(...).catch(...)`, and every `send*`
   function stays `async` so a synchronous throw becomes a catchable rejection.
-- `shared/utils/shop.ts` and `shared/utils/cancelReasons.ts` — no changes.
-- `app/types/shop.ts` — no changes, apart from deleting `Profile.created_at` if
-  `/api/auth/me` does not carry it.
-- `app/stores/cart.ts`, `app/pages/{index,shop,cart,checkout,confirmation}.vue`
-  and `app/pages/products/[slug].vue` — they consume `useCatalog()` and the
-  order routes, whose shapes are preserved.
+- `shared/utils/shop.ts` — `stockTone()`, `stockLabel()`, `fmtPrice()`,
+  `batchInfo()`, `deliveryWindow()` are all pure functions of numbers and dates.
+- `shared/utils/cancelReasons.ts`
+- `app/stores/cart.ts` — `CartItem` is a client-side view model, not a row.
 
 ---
 
@@ -395,8 +437,13 @@ this repo is worked on from two machines.
 7. Reseed the 8 demo orders by direct insert — deliberately **not** through
    `/api/orders`, so no confirmation mail fires at `felix.m@mail.de` and the
    other fake addresses
-8. Rewrite the code
-9. Move mail to the company SMTP server (§7)
+8. Write `shared/types/directus.ts` and `server/utils/directus.ts`
+9. Rewrite the server routes and `auth.ts`
+10. Rename pass across `app/` and the three mail templates, then **typecheck**
+    before going further — a missed rename is silent until it renders
+11. Delete the Supabase module, dependency, `supabaseAdmin.ts` and
+    `database.types.ts`
+12. Move mail to the company SMTP server (§7)
 
 ## 7. Mail
 
@@ -447,9 +494,19 @@ No test framework, by choice. Verified by running things:
 - an order for more than the available stock → 400 with the friendly message
 - confirmation, shipped and canceled mails arrive at a real address
 - `/api/dev/preview-mail?template=…` still renders all three
-- typecheck clean:
-  `npx --yes -p vue-tsc@2.2.10 -p typescript@5.8.3 vue-tsc --noEmit -p .nuxt/tsconfig.json`
-  (verify it actually ran — a crashed run and a pass both produce no output)
+- product images load as sized `webp` via `assetUrl()`, not full-resolution
+  originals
+
+**Typecheck twice — once immediately after the rename pass, once at the end:**
+
+```bash
+npx --yes -p vue-tsc@2.2.10 -p typescript@5.8.3 vue-tsc --noEmit -p .nuxt/tsconfig.json
+```
+
+Exit 0 with no output means clean. **Verify it really ran** — an empty result
+from a crashed run looks identical to a pass if you only grep for errors. This
+is the only mechanical check that a field rename was missed; there is no test
+suite, and neither `yarn dev` nor `yarn build` typechecks.
 
 ## 10. Out of scope
 

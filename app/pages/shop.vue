@@ -35,7 +35,7 @@ const filtered = computed(() => {
   let list = [...products.value]
   if (activeCategory.value !== 'all') {
     const cat = categories.value.find(c => c.slug === activeCategory.value)
-    list = list.filter(p => p.category_id === cat?.id)
+    list = list.filter(p => p.category.id === cat?.id)
   }
   switch (activeSort.value) {
     case 'price-asc': list.sort((a, b) => a.price_cents - b.price_cents); break
@@ -46,7 +46,7 @@ const filtered = computed(() => {
 })
 
 function categoryCount(id: string) {
-  return products.value.filter(p => p.category_id === id).length
+  return products.value.filter(p => p.category.id === id).length
 }
 
 const sortOpen = ref(false)

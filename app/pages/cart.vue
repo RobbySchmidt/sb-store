@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const cart = useCartStore()
 const batch = batchInfo()
+const img = useAssetUrl()
 
-// live stock, so a cart line can never be raised above what the shop can ship.
-// Shares useAsyncData('catalog') with the rest of the shop — no extra request.
+// live availability, so a cart line can never be raised above what the shop can
+// ship. Shares the 'catalog' fetch with the rest of the shop — no extra request.
 const { data: catalog } = await useCatalog()
 function stockOf(productId: string): number {
-  return catalog.value?.products.find(p => p.id === productId)?.stock ?? Infinity
+  return catalog.value?.products.find(p => p.id === productId)?.stock_available ?? Infinity
 }
 
 useHead({ title: 'Your cart — Ember & Oak' })
@@ -58,7 +59,7 @@ useHead({ title: 'Your cart — Ember & Oak' })
             class="relative flex gap-4 md:gap-5 border-t border-line py-5 md:py-6 first:border-t-0"
           >
             <NuxtLink :to="`/products/${item.slug}`" class="block h-[72px] w-[72px] md:h-[92px] md:w-[92px] shrink-0 overflow-hidden rounded-lg bg-cream-alt">
-              <img v-if="item.image" :src="item.image" :alt="item.name" class="h-full w-full object-cover">
+              <img v-if="item.image" :src="img(item.image, { width: 184, height: 184, fit: 'cover', format: 'webp' }) ?? undefined" :alt="item.name" class="h-full w-full object-cover">
             </NuxtLink>
             <div class="flex grow flex-col md:flex-row md:items-center gap-3 md:gap-5">
               <div class="grow pr-8 md:pr-0">

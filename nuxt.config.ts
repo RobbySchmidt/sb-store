@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@pinia/nuxt', '@nuxtjs/supabase'],
+  modules: ['@pinia/nuxt'],
 
   css: ['~/assets/css/main.css'],
 
@@ -30,7 +30,9 @@ export default defineNuxtConfig({
     ],
   },
 
-  supabase: {
-    redirect: false,
+  runtimeConfig: {
+    public: {
+      directusUrl: process.env.DIRECTUS_URL,
+    },
   },
 })

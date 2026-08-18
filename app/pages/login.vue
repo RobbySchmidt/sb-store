@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient()
-const { loadFor, landingPath } = useProfile()
+const { profile, landingPath } = useProfile()
 
 // already signed in? the middleware bounces to /admin or /account before paint
 definePageMeta({ middleware: 'redirect-if-signed-in' })
@@ -16,23 +15,19 @@ async function submit() {
   error.value = null
   busy.value = true
 
-  // The Supabase SDK RETURNS an error object rather than throwing an h3
-  // error, so this is error.message — not the e.data.statusMessage shape
-  // used for our own API routes.
-  const { data, error: authError } = await supabase.auth.signInWithPassword({
-    email: email.value.trim(),
-    password: password.value,
-  })
-  busy.value = false
-
-  if (authError || !data.user) {
-    error.value = authError?.message ?? 'Could not sign you in.'
-    return
+  try {
+    profile.value = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: { email: email.value.trim(), password: password.value },
+    })
+    await navigateTo(landingPath.value)
+  } catch (e: any) {
+    // e.data.statusMessage keeps the original text — e.statusMessage is the
+    // HTTP reason phrase, which h3 strips of non-ASCII
+    error.value = e?.data?.statusMessage ?? e?.data?.message ?? 'Could not sign you in.'
+  } finally {
+    busy.value = false
   }
-
-  // data.user is a real User from the auth SDK — .id is correct here
-  await loadFor(data.user.id)
-  await navigateTo(landingPath.value)
 }
 
 const inputClass =

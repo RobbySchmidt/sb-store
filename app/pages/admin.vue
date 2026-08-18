@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import type { Order, OrderStatus } from '~/types/shop'
+import type { OrderStatus } from '~~/shared/types/directus'
+import type { ExpandedOrder } from '~/composables/useShop'
 
 definePageMeta({ layout: false, middleware: 'admin' })
 
 // deep: true — Nuxt 4 defaults useFetch data to a shallowRef, which would not
 // react to the optimistic `order.status = …` mutation in setStatus() below
-const { data: ordersData, refresh } = await useFetch<Order[]>('/api/admin/orders', { deep: true })
+const { data: ordersData, refresh } = await useFetch<ExpandedOrder[]>('/api/admin/orders', { deep: true })
 const orders = computed(() => ordersData.value ?? [])
 
-const supabase = useSupabaseClient()
-const { profile } = useProfile()
-
-async function signOut() {
-  await supabase.auth.signOut()
-  profile.value = null
-  await navigateTo('/')
-}
+const { signOut } = useProfile()
 
 const statusFilter = ref<'all' | OrderStatus>('all')
 const query = ref('')
@@ -23,21 +17,21 @@ const expandedId = ref<string | null>(null)
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-function shortNo(order: Order) {
+function shortNo(order: ExpandedOrder) {
   return '#' + (order.order_number.split('-').pop() ?? order.order_number)
 }
 function fmtDate(iso: string) {
   const d = new Date(iso)
   return `${MONTHS[d.getMonth()]} ${d.getDate()}`
 }
-function itemsCount(order: Order) {
-  return order.order_items.reduce((n, i) => n + i.quantity, 0)
+function itemsCount(order: ExpandedOrder) {
+  return order.items.reduce((n, i) => n + i.quantity, 0)
 }
 
 // ---- header stats ----
 const now = new Date()
 const weekAgo = new Date(now.getTime() - 7 * 86400000)
-const thisWeek = computed(() => orders.value.filter(o => new Date(o.created_at) >= weekAgo))
+const thisWeek = computed(() => orders.value.filter(o => new Date(o.date_created) >= weekAgo))
 const openCount = computed(() => orders.value.filter(o => o.status === 'open').length)
 const weekRevenue = computed(() =>
   thisWeek.value.filter(o => o.status !== 'canceled').reduce((n, o) => n + o.total_cents, 0))
@@ -72,7 +66,7 @@ const saving = ref<string | null>(null)
 /** surfaced when a status change is rejected — e.g. reopening an order whose stock is gone */
 const statusError = ref<string | null>(null)
 async function setStatus(
-  order: Order,
+  order: ExpandedOrder,
   status: OrderStatus,
   extra?: { reason: string | null; note: string | null },
 ) {
@@ -109,9 +103,9 @@ async function setStatus(
 
 // ---- cancellation dialog ----
 // shallowRef: the entry already is the reactive order object from `orders`
-const cancelTarget = shallowRef<Order | null>(null)
+const cancelTarget = shallowRef<ExpandedOrder | null>(null)
 
-function pickStatus(order: Order, status: OrderStatus) {
+function pickStatus(order: ExpandedOrder, status: OrderStatus) {
   if (status !== 'canceled') return setStatus(order, status)
   // canceling asks for a reason first — nothing is touched until the dialog confirms
   if (order.status === 'canceled' || saving.value) return
@@ -259,7 +253,7 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
               <Icon name="ChevronRight" :size="13" :stroke-width="2.5" class="text-muted transition-transform" :class="expandedId === order.id ? 'rotate-90' : ''" />
               {{ shortNo(order) }}
             </span>
-            <span class="text-[13px] text-muted">{{ fmtDate(order.created_at) }}</span>
+            <span class="text-[13px] text-muted">{{ fmtDate(order.date_created) }}</span>
             <span class="truncate text-sm font-medium">{{ order.customer_name }}</span>
             <span class="truncate text-[13px] text-muted">{{ order.email }}</span>
             <span class="text-right text-[13px]">{{ itemsCount(order) }}</span>
@@ -289,7 +283,7 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
               <div class="rounded-xl bg-cream p-5">
                 <p class="mono-label text-[10px] font-semibold text-muted">LINE ITEMS</p>
                 <div class="mt-3 space-y-2">
-                  <div v-for="(item, i) in order.order_items" :key="i" class="flex justify-between text-[13px]">
+                  <div v-for="(item, i) in order.items" :key="i" class="flex justify-between text-[13px]">
                     <span>{{ item.product_name }} × {{ item.quantity }}</span>
                     <span class="font-medium">{{ fmtPrice(item.unit_price_cents * item.quantity) }}</span>
                   </div>
@@ -357,14 +351,14 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
           <p class="mt-3 text-sm font-medium">{{ order.customer_name }}</p>
           <p class="text-[13px] text-muted">{{ order.email }}</p>
           <div class="mt-2 flex items-center justify-between text-[13px] text-muted">
-            <span>{{ fmtDate(order.created_at) }} · {{ itemsCount(order) }} {{ itemsCount(order) === 1 ? 'item' : 'items' }}</span>
+            <span>{{ fmtDate(order.date_created) }} · {{ itemsCount(order) }} {{ itemsCount(order) === 1 ? 'item' : 'items' }}</span>
             <span class="text-[15px] font-semibold text-espresso">{{ fmtPrice(order.total_cents) }}</span>
           </div>
 
           <div v-if="expandedId === order.id" class="mt-4 rounded-xl bg-cream p-4">
             <p class="mono-label text-[10px] font-semibold text-muted">LINE ITEMS</p>
             <div class="mt-2.5 space-y-1.5">
-              <div v-for="(item, i) in order.order_items" :key="i" class="flex justify-between text-[13px]">
+              <div v-for="(item, i) in order.items" :key="i" class="flex justify-between text-[13px]">
                 <span>{{ item.product_name }} × {{ item.quantity }}</span>
                 <span class="font-medium">{{ fmtPrice(item.unit_price_cents * item.quantity) }}</span>
               </div>

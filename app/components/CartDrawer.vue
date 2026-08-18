@@ -1,13 +1,14 @@
 <script setup lang="ts">
 const cart = useCartStore()
 const batch = batchInfo()
+const img = useAssetUrl()
 
-// live stock, so a cart line can never be raised above what the shop can ship.
-// Not awaited: the drawer lives in the default layout and every page that renders
-// it has already resolved the shared useAsyncData('catalog').
+// live availability, so a cart line can never be raised above what the shop can
+// ship. Not awaited: the drawer lives in the default layout and every page that
+// renders it has already resolved the shared 'catalog' fetch.
 const { data: catalog } = useCatalog()
 function stockOf(productId: string): number {
-  return catalog.value?.products.find(p => p.id === productId)?.stock ?? Infinity
+  return catalog.value?.products.find(p => p.id === productId)?.stock_available ?? Infinity
 }
 
 function close() { cart.drawerOpen = false }
@@ -91,7 +92,7 @@ onUnmounted(() => {
                 class="relative flex gap-4 border-t border-[#EFE4D8]/14 py-5 first:border-t-0"
               >
                 <NuxtLink :to="`/products/${item.slug}`" class="block h-[76px] w-[76px] shrink-0 overflow-hidden rounded-lg bg-[#3B2A21]" @click="close">
-                  <img v-if="item.image" :src="item.image" :alt="item.name" class="h-full w-full object-cover">
+                  <img v-if="item.image" :src="img(item.image, { width: 152, height: 152, fit: 'cover', format: 'webp' }) ?? undefined" :alt="item.name" class="h-full w-full object-cover">
                 </NuxtLink>
                 <div class="flex grow flex-col">
                   <p class="pr-7 font-display text-[15px] font-semibold leading-snug text-cream">{{ item.name }}</p>

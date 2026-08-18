@@ -1,29 +1,29 @@
+import { readItems } from '@directus/sdk'
+
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event)
-  const db = supabaseAdmin()
-  // products(...) is a live join for thumbnails and links only — name and price
-  // stay snapshotted on order_items. Null when the product was since deleted.
-  const select = '*, order_items(*, products(slug, image_url))'
+  const db = directus()
+  // product(...) is a live relation for thumbnails and links only — name and
+  // price stay snapshotted on the line. Null once the product is deleted.
+  const fields = ['*', { items: ['*', { product: ['id', 'slug', 'image'] }] }] as const
 
-  // Two queries rather than one PostgREST .or(): that filter is built by
-  // string concatenation, so an email containing a comma or a parenthesis
-  // would silently corrupt it.
+  // `fields as any`: the SDK cannot see through EoOrderItem.product's `| null`
+  // to the relation, so it rejects the nested expansion at the type level only.
+  //
+  // Two queries rather than one _or filter, matching the original reasoning:
+  // keep the email match a plain equality rather than something assembled by
+  // string concatenation.
   const [byUser, byEmail] = await Promise.all([
-    db.from('orders').select(select).eq('user_id', user.id),
+    db.request(readItems('eo_orders', { fields: fields as any, filter: { user: { _eq: user.id } }, limit: -1 })),
     user.email
-      ? db.from('orders').select(select).eq('email', user.email)
-      : Promise.resolve({ data: [], error: null }),
+      ? db.request(readItems('eo_orders', { fields: fields as any, filter: { email: { _eq: user.email } }, limit: -1 }))
+      : Promise.resolve([]),
   ])
 
-  if (byUser.error) throw createError({ statusCode: 500, statusMessage: byUser.error.message })
-  if (byEmail.error) throw createError({ statusCode: 500, statusMessage: byEmail.error.message })
-
   const merged = new Map<string, any>()
-  for (const order of [...(byUser.data ?? []), ...(byEmail.data ?? [])]) {
-    merged.set(order.id, order)
-  }
+  for (const order of [...byUser, ...byEmail] as any[]) merged.set(order.id, order)
 
   return [...merged.values()].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    (a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime(),
   )
 })

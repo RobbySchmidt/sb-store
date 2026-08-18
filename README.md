@@ -4,56 +4,66 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ## Setting up on a new machine
 
-Everything needed to run this project is in the repo except `.env`, which holds
-the Supabase keys and is deliberately gitignored — `SUPABASE_SECRET_KEY` is the
-service-role key and bypasses row level security, so it must never be pushed.
+Everything needed to run this project is in the repo except `.env`, which is
+deliberately gitignored. It holds `DIRECTUS_API_TOKEN` — a static token on a
+Directus Administrator that bypasses permissions entirely — and the SMTP
+password, so it must never be pushed.
 
-Requirements: Node, [yarn](https://yarnpkg.com/), and Docker Desktop (for the
-local mail catcher).
+Requirements: Node and [yarn](https://yarnpkg.com/). Docker is no longer needed
+unless you want the local mail catcher (see *Local mail*).
 
 ```bash
 git clone <repo-url> sb-store
 cd sb-store
 yarn install
-cp .env.example .env      # then fill in the Supabase values, see below
-docker compose up -d      # pulls and starts Mailpit
+cp .env.example .env      # then fill in the two blanks, see below
 yarn dev
 ```
 
-Fill the four Supabase values in `.env` from the Supabase dashboard of the
-existing project — **Project Settings → API** gives you the project URL and both
-keys, **Project Settings → Database** gives you the connection string:
+`.env.example` carries every key with the non-secret values already filled in.
+Two blanks to fill:
 
 | `.env` key | Where it comes from |
 | --- | --- |
-| `SUPABASE_URL` | Project URL |
-| `SUPABASE_KEY` | anon / publishable key |
-| `SUPABASE_SECRET_KEY` | service_role / secret key — server-side only |
-| `DATABASE_URL` | Database connection string |
+| `DIRECTUS_API_TOKEN` | Directus → User → Token, on an Administrator account |
+| `MAIL_USER` / `MAIL_PASS` | the `contact@rholing.de` mailbox credentials |
 
-The `MAIL_*` values in `.env.example` already point at the local Mailpit
-container and need no changes. The database itself is hosted at Supabase, so
-both machines share the same data — no migration or seeding needed on the
-second machine.
+**The schema and data live on the shared Directus instance, so there is nothing
+to migrate or seed on the second machine.** If you ever do need to rebuild it:
+
+```bash
+yarn directus:setup   # role, policy, file folder, collections, fields, relations
+yarn directus:seed    # categories, products, images, demo orders
+```
+
+Both are idempotent — running them against an instance that already has
+everything reports only "exists" and changes nothing.
+
+> That instance is **shared with other projects**. Only the `Ember_Oak_Shop`
+> group and the `eo_*` collections belong to this app.
 
 ## Accounts
 
-The store has email/password accounts with two roles.
+The store has email/password accounts with two roles, backed by Directus users.
 
-- Register at `/register`. Signing up with **schmidt@rhowerk.de** automatically
-  gets the `admin` role — the address is baked into the signup trigger in
-  `supabase/migration-005-auth-and-roles.sql`. Everyone else becomes a
-  `customer`.
+- Register at `/register`. New accounts get the **Ember & Oak Customer** role,
+  created by `yarn directus:setup`. Registration goes through our own
+  `/api/auth/register` rather than Directus's built-in public registration,
+  because that one has a single instance-wide default role another project
+  depends on.
+- **Admin is any Directus user with `admin_access`** — so `schmidt@rhowerk.de`
+  works with the existing Directus account, no separate signup. Note this also
+  means every other Administrator on that instance can reach `/admin`.
 - Admins land on `/admin` after signing in, customers on `/account`, which
   lists their own orders.
 - Buying does **not** require an account — guest checkout still works. An order
   placed as a guest shows up on an account later if the email matches.
-- Signup email confirmation is **off**: Supabase dashboard → Authentication →
-  Providers → Email → *Confirm email*. Supabase is hosted, so its auth mails
-  could not reach the local Mailpit container anyway.
+- **Nothing verifies the email address**, so that fallback is trust-on-
+  assertion: registering with someone else's address would show their orders.
+  Accepted for a fake shop.
 
-Both of those are settings on the shared hosted Supabase project, so **none of
-this needs redoing on the second machine**, and no new `.env` keys are involved.
+Sessions are httpOnly cookies set by our own Nitro routes, holding Directus
+access and refresh tokens. None of this needs redoing on the second machine.
 
 ## Setup
 
@@ -127,22 +137,42 @@ bun run preview
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
-## Local mail
+## Mail
 
-Order confirmations are sent over SMTP to [Mailpit](https://mailpit.axllent.org/),
-a local mail catcher running in Docker. It accepts every message and delivers
-nothing — no mail ever leaves your machine, so you can check out with any
-made-up address.
+> ⚠️ **Order mail goes to real inboxes.** `MAIL_*` points at the company SMTP
+> server (`mail.agenturserver.de`, port 465, implicit TLS). Check out with your
+> own address unless you mean it.
+
+The transport reads `MAIL_*` and nothing else, so changing provider is an
+`.env` change with no code change.
+
+**If a test mail doesn't show up, check spam before debugging.** The first one
+sent through this account landed there; the rest arrived normally. Sends are
+fire-and-forget and only log on failure, so silence in the dev-server log means
+the mail was accepted — not that nothing happened.
+
+To iterate on a template without placing an order, open
+http://localhost:3000/api/dev/preview-mail?template=confirmation while the dev
+server runs (`shipped` and `canceled` are the other two). Dev only — it 404s in
+production.
+
+### Catching mail locally instead
+
+[Mailpit](https://mailpit.axllent.org/) is still in `docker-compose.yml`. It
+accepts every message and delivers nothing, so no mail leaves your machine.
 
 ```bash
-docker compose up -d     # start it
+docker compose up -d
 ```
 
-- Inbox UI: http://localhost:8025
-- SMTP endpoint: `localhost:1025` (configured via `MAIL_*` in `.env`, see `.env.example`)
+Then point `.env` at it — inbox on http://localhost:8025:
 
-Copy `.env.example` to `.env` and fill in the Supabase values before running the
-app. Pointing at a real mail provider later is an `.env` change only.
+```
+MAIL_HOST=localhost
+MAIL_PORT=1025
+MAIL_SECURE=false
+MAIL_USER=
+```
 
-To iterate on the mail template without placing an order, open
-http://localhost:3000/api/dev/preview-mail while the dev server runs.
+`MAIL_USER` must be blank: the transport only sends credentials when one is
+set, and Mailpit accepts none.

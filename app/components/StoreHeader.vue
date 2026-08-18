@@ -4,15 +4,11 @@ const route = useRoute()
 const menuOpen = ref(false)
 const batch = batchInfo()
 
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
-const { profile, isAdmin } = useProfile()
+const { profile, isAdmin, signOut } = useProfile()
 
 async function signOutFromMenu() {
   menuOpen.value = false
-  await supabase.auth.signOut()
-  profile.value = null
-  await navigateTo('/')
+  await signOut()
 }
 
 const navLinks = [
@@ -171,7 +167,7 @@ function openCartFromMenu() {
 
           <p class="mono-label mt-10 text-[10px] font-medium text-[#EFE4D8]/50">ACCOUNT</p>
           <div class="mt-3 flex flex-col items-start">
-            <template v-if="user">
+            <template v-if="profile">
               <NuxtLink to="/account" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">My orders</NuxtLink>
               <NuxtLink v-if="isAdmin" to="/admin" class="py-2 text-[17px] font-medium text-[#EFE4D8]/85">Admin dashboard</NuxtLink>
               <button class="py-2 text-[17px] font-medium text-[#EFE4D8]/85" @click="signOutFromMenu">Sign out</button>

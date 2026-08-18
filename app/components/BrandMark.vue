@@ -10,7 +10,20 @@ withDefaults(defineProps<{
   stampOnly?: boolean
 }>(), { size: 52, stampOnly: false })
 
-const STAMP_IMG = 'https://hgnmtnjrfchfpvxlinqn.supabase.co/storage/v1/object/public/product-images/ember-blend-dark-roast.jpg'
+/**
+ * The stamp photo is the Ember Blend bag, read out of the catalog rather than
+ * pinned to a file id — the id changes every time the instance is re-seeded,
+ * and a wrong one would fail silently as a missing logo.
+ *
+ * Not awaited, and no extra request: BrandMark only ever renders inside
+ * StoreHeader, which lives in the same layout as CartDrawer — the shared
+ * 'catalog' fetch is already in flight there.
+ */
+const { data: catalog } = useCatalog()
+const img = useAssetUrl()
+const stampImg = computed(() =>
+  img(catalog.value?.products.find(p => p.slug === 'ember-blend-dark-roast')?.image,
+    { width: 128, height: 128, fit: 'cover', format: 'webp' }))
 </script>
 
 <template>
@@ -25,7 +38,8 @@ const STAMP_IMG = 'https://hgnmtnjrfchfpvxlinqn.supabase.co/storage/v1/object/pu
         </text>
       </svg>
       <img
-        :src="STAMP_IMG"
+        v-if="stampImg"
+        :src="stampImg"
         alt=""
         class="absolute rounded-full object-cover"
         :style="{

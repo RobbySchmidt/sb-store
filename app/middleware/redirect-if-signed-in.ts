@@ -7,12 +7,8 @@
  * Route middleware runs during route resolution, ahead of paint.
  */
 export default defineNuxtRouteMiddleware(async () => {
-  const user = useSupabaseUser()
-  if (!user.value) return
-
-  const { profile, refresh, landingPath } = useProfile()
-  // `sub`, not `id` — useSupabaseUser() returns JWT claims, not a user row
-  if (profile.value?.id !== user.value.sub) await refresh()
-
-  return navigateTo(landingPath.value)
+  const { profile, landingPath, refresh } = useProfile()
+  // middleware can run before profile.client.ts on a hard load
+  if (!profile.value) await refresh()
+  if (profile.value) return navigateTo(landingPath.value)
 })

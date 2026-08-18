@@ -6,6 +6,7 @@ const step = ref<1 | 2>(1)
 const placing = ref(false)
 const placeError = ref('')
 const summaryOpen = ref(false)
+const img = useAssetUrl()
 
 const form = reactive({
   firstName: '', lastName: '', email: '',
@@ -131,7 +132,7 @@ const inputClass = (key: string) =>
         <div v-if="summaryOpen" class="card mt-2 px-5 py-4">
           <div v-for="item in cart.items" :key="item.productId" class="flex items-center gap-3.5 py-2.5">
             <div class="relative h-[46px] w-[46px] shrink-0 rounded-lg bg-cream-alt overflow-hidden">
-              <img v-if="item.image" :src="item.image" :alt="item.name" class="h-full w-full object-cover">
+              <img v-if="item.image" :src="img(item.image, THUMB) ?? undefined" :alt="item.name" class="h-full w-full object-cover">
               <span class="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-terra px-1 text-[10px] font-bold text-white">{{ item.qty }}</span>
             </div>
             <p class="grow text-[13px] font-medium leading-snug">{{ item.name }}</p>
@@ -271,7 +272,7 @@ const inputClass = (key: string) =>
           <div class="mt-5 space-y-4">
             <div v-for="item in cart.items" :key="item.productId" class="flex items-center gap-3.5">
               <div class="relative h-[54px] w-[54px] shrink-0 overflow-hidden rounded-lg bg-[#3B2A21]">
-                <img v-if="item.image" :src="item.image" :alt="item.name" class="h-full w-full object-cover">
+                <img v-if="item.image" :src="img(item.image, THUMB) ?? undefined" :alt="item.name" class="h-full w-full object-cover">
                 <span class="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-terra px-1 text-[10px] font-bold text-white">{{ item.qty }}</span>
               </div>
               <p class="grow text-[13px] font-medium leading-snug text-cream">{{ item.name }}</p>

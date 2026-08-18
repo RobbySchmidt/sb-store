@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AssetOptions } from '~~/shared/utils/assetUrl'
+
 const { data: catalog } = await useCatalog()
 
 const products = computed(() => catalog.value?.products ?? [])
@@ -8,9 +10,19 @@ const featuredSlugs = ['ember-blend-dark-roast', 'sunrise-single-origin-ethiopia
 const featured = computed(() =>
   featuredSlugs.map(s => products.value.find(p => p.slug === s)).filter(Boolean) as NonNullable<typeof products.value[0]>[])
 
-const heroImage = computed(() => products.value.find(p => p.slug === 'house-espresso-classic')?.image_url)
 const batch = batchInfo()
-const tanneryImage = computed(() => products.value.find(p => p.slug === 'glass-carafe-brewer')?.image_url)
+const img = useAssetUrl()
+
+/** The Directus asset URL for a product's photo, by slug. */
+function photo(slug: string, opts: AssetOptions) {
+  return img(products.value.find(p => p.slug === slug)?.image, opts) ?? undefined
+}
+
+const BAND = { width: 1600, quality: 78, format: 'webp' } as const
+const TILE = { width: 720, height: 520, fit: 'cover', format: 'webp' } as const
+
+const heroImage = computed(() => photo('house-espresso-classic', BAND))
+const tanneryImage = computed(() => photo('glass-carafe-brewer', BAND))
 
 const tileImages: Record<string, string> = {
   coffee: 'sunrise-single-origin-ethiopia',
@@ -18,10 +30,11 @@ const tileImages: Record<string, string> = {
   accessories: 'ceramic-pour-over-dripper',
 }
 function tileImage(slug: string) {
-  return products.value.find(p => p.slug === tileImages[slug])?.image_url ?? undefined
+  const productSlug = tileImages[slug]
+  return productSlug ? photo(productSlug, TILE) : undefined
 }
 function categoryCount(id: string) {
-  return products.value.filter(p => p.category_id === id).length
+  return products.value.filter(p => p.category.id === id).length
 }
 
 const email = ref('')
