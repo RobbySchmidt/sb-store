@@ -22,6 +22,7 @@ export interface Product {
   price_cents: number
   image_url: string | null
   is_active: boolean
+  stock: number
   meta: ProductMeta
   categories?: { name: string; slug: string } | null
 }
@@ -58,6 +59,8 @@ export interface Order {
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
+  cancel_reason: string | null
+  cancel_note: string | null
   created_at: string
   order_items: OrderItem[]
 }

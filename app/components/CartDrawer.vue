@@ -2,6 +2,14 @@
 const cart = useCartStore()
 const batch = batchInfo()
 
+// live stock, so a cart line can never be raised above what the shop can ship.
+// Not awaited: the drawer lives in the default layout and every page that renders
+// it has already resolved the shared useAsyncData('catalog').
+const { data: catalog } = useCatalog()
+function stockOf(productId: string): number {
+  return catalog.value?.products.find(p => p.id === productId)?.stock ?? Infinity
+}
+
 function close() { cart.drawerOpen = false }
 
 // lock body scroll while open
@@ -89,12 +97,21 @@ onUnmounted(() => {
                   <p class="pr-7 font-display text-[15px] font-semibold leading-snug text-cream">{{ item.name }}</p>
                   <p class="mono-label mt-1 text-[10px] text-[#EFE4D8]/55">{{ fmtPrice(item.unitPriceCents) }} EACH</p>
                   <div class="mt-2.5 flex items-center justify-between">
-                    <QtyStepper
-                      :model-value="item.qty"
-                      variant="dark"
-                      :size="36"
-                      @update:model-value="cart.setQty(item.productId, $event)"
-                    />
+                    <div class="flex flex-col items-start gap-1">
+                      <QtyStepper
+                        :model-value="item.qty"
+                        variant="dark"
+                        :size="36"
+                        :max="Math.max(1, stockOf(item.productId))"
+                        @update:model-value="cart.setQty(item.productId, $event)"
+                      />
+                      <p
+                        v-if="item.qty >= stockOf(item.productId)"
+                        class="mono-label text-[10px] font-semibold text-status-open"
+                      >
+                        {{ stockLabel(stockOf(item.productId)) }}
+                      </p>
+                    </div>
                     <span class="text-[15px] font-semibold text-cream">{{ fmtPrice(item.qty * item.unitPriceCents) }}</span>
                   </div>
                 </div>

@@ -2,6 +2,13 @@
 const cart = useCartStore()
 const batch = batchInfo()
 
+// live stock, so a cart line can never be raised above what the shop can ship.
+// Shares useAsyncData('catalog') with the rest of the shop — no extra request.
+const { data: catalog } = await useCatalog()
+function stockOf(productId: string): number {
+  return catalog.value?.products.find(p => p.id === productId)?.stock ?? Infinity
+}
+
 useHead({ title: 'Your cart — Ember & Oak' })
 </script>
 
@@ -60,11 +67,20 @@ useHead({ title: 'Your cart — Ember & Oak' })
                 </NuxtLink>
                 <p class="mono-label mt-1 text-[10px] text-muted">{{ fmtPrice(item.unitPriceCents) }} EACH</p>
               </div>
-              <QtyStepper
-                :model-value="item.qty"
-                :size="40"
-                @update:model-value="cart.setQty(item.productId, $event)"
-              />
+              <div class="flex flex-col items-start gap-1">
+                <QtyStepper
+                  :model-value="item.qty"
+                  :size="40"
+                  :max="Math.max(1, stockOf(item.productId))"
+                  @update:model-value="cart.setQty(item.productId, $event)"
+                />
+                <p
+                  v-if="item.qty >= stockOf(item.productId)"
+                  class="mono-label text-[10px] font-semibold text-status-open-text"
+                >
+                  {{ stockLabel(stockOf(item.productId)) }}
+                </p>
+              </div>
               <span class="min-w-[70px] text-right text-[16px] font-semibold">{{ fmtPrice(item.qty * item.unitPriceCents) }}</span>
             </div>
             <button

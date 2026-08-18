@@ -1,5 +1,5 @@
-const FREE_SHIPPING_CENTS = 4900
-const SHIPPING_FLAT_CENTS = 490
+import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '../../shared/utils/shop'
+import { sendOrderConfirmation } from '../utils/email/confirmation'
 
 interface OrderPayload {
   customer: {
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   // ---- price everything server-side from the live catalog ----
   const ids = items.map(i => i.productId)
   const { data: products, error: pErr } = await db
-    .from('products').select('id, name, price_cents').in('id', ids)
+    .from('products').select('id, name, price_cents, stock').in('id', ids)
   if (pErr) throw createError({ statusCode: 500, statusMessage: pErr.message })
   if (!products || products.length !== new Set(ids).size) {
     throw createError({ statusCode: 400, statusMessage: 'Unknown product in cart' })
@@ -50,6 +50,23 @@ export default defineEventHandler(async (event) => {
   const subtotal = lines.reduce((n, l) => n + l.unit_price_cents * l.quantity, 0)
   const shipping = subtotal >= FREE_SHIPPING_CENTS ? 0 : SHIPPING_FLAT_CENTS
   const total = subtotal + shipping
+
+  // ---- stock pre-check: a friendly 400 before anything is written ----
+  const short = lines
+    .map((l) => {
+      const p = products.find(x => x.id === l.product_id)!
+      return { name: p.name, want: l.quantity, have: p.stock }
+    })
+    .filter(s => s.have < s.want)
+
+  if (short.length) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: short
+        .map(s => s.have === 0 ? `${s.name} is out of stock` : `${s.name} — only ${s.have} left`)
+        .join('; '),
+    })
+  }
 
   // ---- create order + items ----
   const { data: order, error: oErr } = await db
@@ -74,8 +91,23 @@ export default defineEventHandler(async (event) => {
     .insert(lines.map(l => ({ ...l, order_id: order.id })))
   if (iErr) {
     await db.from('orders').delete().eq('id', order.id)
+    // The stock trigger lost a race with a concurrent checkout: products_stock_non_negative
+    if (iErr.code === '23514') {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Someone just bought the last one — please check your cart and try again.',
+      })
+    }
     throw createError({ statusCode: 500, statusMessage: iErr.message })
   }
 
-  return { ...order, order_items: lines }
+  // Fire-and-forget: a mail failure must never fail an order that is already in the database
+  const full = { ...order, order_items: lines }
+  event.waitUntil(
+    sendOrderConfirmation(full).catch(err =>
+      console.error(`[mail] confirmation for ${order.order_number} failed:`, err),
+    ),
+  )
+
+  return full
 })

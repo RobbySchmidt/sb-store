@@ -53,7 +53,10 @@ async function placeOrder() {
     cart.clear()
     await navigateTo('/confirmation')
   } catch (e: any) {
-    placeError.value = e?.statusMessage ?? e?.message ?? 'Something went wrong placing your order.'
+    // e.data.statusMessage keeps the original text — e.statusMessage comes from the
+    // HTTP reason phrase, which h3 strips of non-ASCII (every product name has an en dash)
+    placeError.value = e?.data?.statusMessage ?? e?.data?.message ?? e?.statusMessage
+      ?? e?.message ?? 'Something went wrong placing your order.'
   } finally {
     placing.value = false
   }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { CartItem, Product } from '~/types/shop'
-import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '~/composables/useShop'
+import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '~~/shared/utils/shop'
 
 const STORAGE_KEY = 'eo-cart'
 const LAST_ORDER_KEY = 'eo-last-order'
@@ -41,14 +41,21 @@ export const useCartStore = defineStore('cart', () => {
 
   function add(product: Product, qty = 1) {
     const existing = items.value.find(i => i.productId === product.id)
-    if (existing) existing.qty += qty
+    const inCart = existing?.qty ?? 0
+    // never let the cart hold more than the shop can actually ship
+    const next = Math.min(inCart + qty, product.stock ?? Infinity)
+    if (next <= inCart) {
+      drawerOpen.value = true // nothing was added — open the cart so it's visible why
+      return
+    }
+    if (existing) existing.qty = next
     else items.value.push({
       productId: product.id,
       slug: product.slug,
       name: product.name,
       unitPriceCents: product.price_cents,
       image: product.image_url,
-      qty,
+      qty: next,
     })
     showToast(product.name)
     drawerOpen.value = true

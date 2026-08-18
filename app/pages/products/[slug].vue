@@ -13,6 +13,31 @@ if (!product.value) {
 const qty = ref(1)
 watch(() => route.params.slug, () => { qty.value = 1 })
 
+const stock = computed(() => product.value?.stock ?? 0)
+const soldOut = computed(() => stock.value <= 0)
+
+/** keep qty inside 1…stock whenever the product (and therefore the stock) changes */
+watch(stock, (s) => {
+  qty.value = Math.min(Math.max(1, qty.value), Math.max(1, s))
+}, { immediate: true })
+
+/** on the white info card */
+const STOCK_TONE_CLASS: Record<'out' | 'low' | 'ok', string> = {
+  out: 'text-status-canceled',
+  // the darker -text variant: plain status-open is only 2.4:1 on white at 10px
+  low: 'text-status-open-text',
+  ok: 'text-muted',
+}
+/** on the espresso sticky bar — the canceled red fails contrast there, ember carries the alarm */
+const STOCK_TONE_CLASS_ONDARK: Record<'out' | 'low' | 'ok', string> = {
+  out: 'text-ember',
+  low: 'text-status-open',
+  ok: 'text-[#EFE4D8]/72',
+}
+
+const stockClass = computed(() => STOCK_TONE_CLASS[stockTone(stock.value)])
+const stockClassOnDark = computed(() => STOCK_TONE_CLASS_ONDARK[stockTone(stock.value)])
+
 const badge = computed(() => badgeLabel(product.value?.categories?.slug))
 const meta = computed(() => product.value?.meta ?? {})
 
@@ -33,7 +58,7 @@ const related = computed(() => {
 })
 
 function addToCart() {
-  if (product.value) cart.add(product.value, qty.value)
+  if (product.value && !soldOut.value) cart.add(product.value, qty.value)
 }
 
 useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` }))
@@ -84,6 +109,10 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
               </span>
             </p>
 
+            <p class="mono-label mt-2 text-[10px] font-semibold" :class="stockClass">
+              {{ stockLabel(stock) }}
+            </p>
+
             <p class="mt-5 text-[15px] leading-[1.75] text-muted">{{ product.description }}</p>
 
             <!-- roast profile (coffee only) -->
@@ -114,10 +143,15 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
             <div class="mt-7 flex flex-col md:flex-row gap-3.5 md:items-center">
               <div class="flex items-center gap-3">
                 <span class="mono-label text-[10px] font-medium text-muted md:hidden">QTY</span>
-                <QtyStepper v-model="qty" :size="44" @update:model-value="qty = Math.max(1, $event)" />
+                <QtyStepper v-model="qty" :size="44" :max="Math.max(1, product.stock)" />
               </div>
-              <button class="btn-primary w-full md:grow" @click="addToCart">
-                Add to cart — {{ fmtPrice(lineTotal) }}
+              <button
+                class="btn-primary w-full md:grow disabled:opacity-40 disabled:hover:bg-terra"
+                :disabled="soldOut"
+                @click="addToCart"
+              >
+                <template v-if="soldOut">Out of stock</template>
+                <template v-else>Add to cart — {{ fmtPrice(lineTotal) }}</template>
               </button>
             </div>
 
@@ -171,8 +205,17 @@ useHead(() => ({ title: `${product.value?.name ?? 'Product'} — Ember & Oak` })
       <div>
         <p class="mono-label text-[9px] font-medium text-[#EFE4D8]/55">TOTAL</p>
         <p class="text-lg font-semibold text-cream">{{ fmtPrice(lineTotal) }}</p>
+        <p class="mono-label mt-0.5 text-[9px] font-semibold" :class="stockClassOnDark">
+          {{ stockLabel(stock) }}
+        </p>
       </div>
-      <button class="btn-primary h-12 grow" @click="addToCart">Add to cart</button>
+      <button
+        class="btn-primary h-12 grow disabled:opacity-40 disabled:hover:bg-terra"
+        :disabled="soldOut"
+        @click="addToCart"
+      >
+        {{ soldOut ? 'Out of stock' : 'Add to cart' }}
+      </button>
     </div>
   </div>
 </template>
