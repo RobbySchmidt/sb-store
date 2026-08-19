@@ -34,6 +34,8 @@ export interface EoProduct {
 
 export type OrderStatus = 'open' | 'marked' | 'canceled'
 
+export type PaymentStatus = 'pending' | 'paid' | 'expired'
+
 export interface EoOrderItem {
   id: string
   order: string | EoOrder
@@ -43,6 +45,8 @@ export interface EoOrderItem {
   product_name: string
   unit_price_cents: number
   quantity: number
+  /** How many of `quantity` have been refunded. Comes off the held stock total. */
+  refunded_quantity: number
 }
 
 export interface EoOrder {
@@ -59,6 +63,16 @@ export interface EoOrder {
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
+  payment_status: PaymentStatus
+  /** Stripe Checkout Session id. Null only in the brief window in
+   *  /api/orders between inserting the order and creating the session. */
+  stripe_session_id: string | null
+  stripe_payment_intent: string | null
+  paid_at: string | null
+  /** Accumulated across every refund. Refund state is DERIVED from this
+   *  against total_cents — there is no `refunded` payment_status. */
+  refunded_cents: number
+  refunded_at: string | null
   cancel_reason: string | null
   cancel_note: string | null
   date_created: string

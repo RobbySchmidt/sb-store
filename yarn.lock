@@ -4352,6 +4352,11 @@ strip-literal@^4.0.0:
   dependencies:
     js-tokens "^10.0.0"
 
+stripe@^22.5.0:
+  version "22.5.0"
+  resolved "https://registry.yarnpkg.com/stripe/-/stripe-22.5.0.tgz#78efe2b9ebcb167da966c356138f2f5ceb3f443e"
+  integrity sha512-QVwMwriC0bbySx6R4dpsvJ0W//GojC1kwWVS6rPSoVqDUIZX4Hy3TaUrd2AZeXEAaKbfWIjQjvo3vKAReHZ0vQ==
+
 structured-clone-es@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/structured-clone-es/-/structured-clone-es-2.0.1.tgz#3c64f91a617a67d05266038d530130e872540bc6"

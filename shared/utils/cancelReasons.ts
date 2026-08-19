@@ -24,6 +24,11 @@ export const CANCEL_REASONS: readonly CancelReason[] = [
     sentence: 'We could not process the payment for this order.',
   },
   {
+    key: 'payment_expired',
+    label: 'Checkout expired',
+    sentence: '',
+  },
+  {
     key: 'address_problem',
     label: 'Address problem',
     sentence: 'We could not ship to the address on the order.',

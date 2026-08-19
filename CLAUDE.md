@@ -204,11 +204,31 @@ yourself.
   emits):
 
   ```bash
-  npx --yes -p vue-tsc@2.2.10 -p typescript@5.8.3 vue-tsc --noEmit -p .nuxt/tsconfig.json
+  npx --yes -p vue-tsc@2.2.10 -p typescript@5.8.3 vue-tsc --build tsconfig.json
   ```
 
   Exit 0 with no output means clean. Verify it really ran — an empty result
   from a crashed run looks identical to a pass if you only grep for errors.
+
+  **`--build tsconfig.json`, not `-p .nuxt/tsconfig.json`.** The older form
+  documented here was checking **only the app**. Nuxt 4 splits the codebase
+  into four TS projects (`.nuxt/tsconfig.{app,server,shared,node}.json`) and
+  the root `tsconfig.json` is a references stub that ties them together.
+  `.nuxt/tsconfig.json` includes `../app/**/*` and `../shared/**/*` but **not
+  `../server/**/*`** — so every Nitro route and every file in `server/utils/`
+  was silently unchecked. On a project where this is the *only* mechanical
+  check, that made it a false pass for most of the backend. It hid a real
+  error in `sweepExpired()` until the server project was run directly.
+
+  To check one project on its own — useful to see errors from just the server
+  side — `-p .nuxt/tsconfig.server.json` still works. Note that `--build`
+  caches per project in `.tsbuildinfo`; a re-run reporting nothing may have
+  skipped an up-to-date project rather than rechecked it.
+
+  If a Directus SDK filter rejects a valid operator (`_lt` on a timestamp, for
+  instance), the cause is usually our hand-written `Schema`: `date_created` is
+  typed `string`, so the SDK offers only string operators. Cast the filter
+  object, not the whole query, so `fields` and `limit` stay checked.
 
 ## Gotchas that cost real time
 

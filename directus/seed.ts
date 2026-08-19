@@ -132,6 +132,10 @@ async function seedOrders() {
       body: JSON.stringify({
         order_number, customer_name, email, street, zip, city, country, status, date_created,
         subtotal_cents: subtotal, shipping_cents: shipping, total_cents: subtotal + shipping,
+        // Demo orders represent completed purchases. Without this they default
+        // to 'pending' and the admin's unpaid-shipping guard refuses them.
+        payment_status: 'paid',
+        paid_at: date_created,
       }),
     })
 
@@ -153,10 +157,33 @@ async function seedOrders() {
   }
 }
 
+/**
+ * The demo orders predate payment_status, so they defaulted to 'pending' when
+ * the column was added. seedOrders() skips rows that already exist, so it can
+ * never fix them — this can. Idempotent: a repaired order is filtered out.
+ */
+async function backfillOrderPayments() {
+  console.log('Demo order payment backfill')
+  for (const o of demoOrders) {
+    const rows = await api(
+      `/items/eo_orders?filter[order_number][_eq]=${o.order_number}` +
+      `&filter[payment_status][_neq]=paid&fields=id,date_created&limit=1`,
+    )
+    const row = rows?.[0]
+    if (!row) { console.log(`  ok     ${o.order_number}`); continue }
+    await api(`/items/eo_orders/${row.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ payment_status: 'paid', paid_at: row.date_created }),
+    })
+    console.log(`  paid   ${o.order_number}`)
+  }
+}
+
 async function main() {
   await seedCatalog()
   await seedImages()
   await seedOrders()
+  await backfillOrderPayments()
   console.log('\nDone.')
 }
 

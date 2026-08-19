@@ -292,6 +292,27 @@ async function main() {
       },
       schema: { default_value: 'open', is_nullable: false },
     },
+    {
+      field: 'payment_status',
+      type: 'string',
+      meta: {
+        interface: 'select-dropdown',
+        required: true,
+        options: {
+          choices: [
+            { text: 'Pending', value: 'pending' },
+            { text: 'Paid', value: 'paid' },
+            { text: 'Expired', value: 'expired' },
+          ],
+        },
+      },
+      schema: { default_value: 'pending', is_nullable: false },
+    },
+    str('stripe_session_id', { unique: true }),
+    str('stripe_payment_intent'),
+    { field: 'paid_at', type: 'timestamp', meta: { interface: 'datetime' }, schema: { is_nullable: true } },
+    int('refunded_cents', { required: true, min: 0, def: 0 }),
+    { field: 'refunded_at', type: 'timestamp', meta: { interface: 'datetime' }, schema: { is_nullable: true } },
     str('customer_name', { required: true }),
     str('email', { required: true }),
     str('street', { required: true }),
@@ -315,6 +336,7 @@ async function main() {
     str('product_name', { required: true }),
     int('unit_price_cents', { required: true, min: 0 }),
     int('quantity', { required: true, min: 1 }),
+    int('refunded_quantity', { required: true, min: 0, def: 0 }),
   ])
 
   // ---- relations ----
