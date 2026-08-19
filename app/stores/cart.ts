@@ -4,13 +4,11 @@ import type { CatalogProduct } from '~/composables/useShop'
 import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '~~/shared/utils/shop'
 
 const STORAGE_KEY = 'eo-cart'
-const LAST_ORDER_KEY = 'eo-last-order'
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
   const drawerOpen = ref(false)
   const toast = ref<{ visible: boolean; name: string }>({ visible: false, name: '' })
-  const lastOrder = ref<any>(null)
 
   let toastTimer: ReturnType<typeof setTimeout> | null = null
   let hydrated = false
@@ -21,9 +19,6 @@ export const useCartStore = defineStore('cart', () => {
     try {
       items.value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
     } catch { items.value = [] }
-    try {
-      lastOrder.value = JSON.parse(sessionStorage.getItem(LAST_ORDER_KEY) ?? 'null')
-    } catch { lastOrder.value = null }
   }
 
   watch(items, (v) => {
@@ -81,15 +76,10 @@ export const useCartStore = defineStore('cart', () => {
     toastTimer = setTimeout(() => { toast.value.visible = false }, 3000)
   }
 
-  function setLastOrder(order: any) {
-    lastOrder.value = order
-    if (import.meta.client) sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order))
-  }
-
   return {
-    items, drawerOpen, toast, lastOrder,
+    items, drawerOpen, toast,
     itemCount, subtotalCents, shippingCents, totalCents,
     freeShippingUnlocked, remainingToFreeCents, freeShippingProgress,
-    hydrate, add, setQty, remove, clear, showToast, setLastOrder,
+    hydrate, add, setQty, remove, clear, showToast,
   }
 })

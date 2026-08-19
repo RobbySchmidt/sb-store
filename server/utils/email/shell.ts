@@ -17,6 +17,7 @@ export interface OrderEmailOrder {
   subtotal_cents: number
   shipping_cents: number
   total_cents: number
+  refunded_cents?: number
   items: OrderEmailItem[]
   cancel_reason?: string | null
   cancel_note?: string | null
@@ -30,6 +31,8 @@ export const MUTED = '#7A6A5C'
 export const LINE = '#E8DFD2'
 export const MARKED = '#5C8A5C'
 export const CANCELED = '#B0483B'
+/** Colour for refund messaging. Between "shipped" green and "canceled" red. */
+export const REFUND = '#9A7217'
 // The site's Google Fonts are unreliable in mail clients — system stack instead
 export const FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
@@ -231,4 +234,42 @@ export function addressText(order: OrderEmailOrder): string {
   return `  ${order.customer_name}
   ${order.street}
   ${order.zip} ${order.city}, ${order.country}`
+}
+
+/** One refunded line as the refund mails describe it. */
+export interface RefundEmailLine {
+  product_name: string
+  quantity: number
+  amount_cents: number
+}
+
+/**
+ * The refund sentence for the cancellation mail. Empty when nothing was
+ * returned, so the caller can drop the whole block.
+ */
+export function refundNoticeHtml(order: OrderEmailOrder): string {
+  const cents = order.refunded_cents ?? 0
+  if (cents <= 0) return ''
+  return `<p style="margin:10px 0 0;font-size:14px;line-height:1.6;color:${ESPRESSO};">`
+    + `We've refunded <strong>${esc(fmtPrice(cents))}</strong> to your original payment method. `
+    + `It usually appears within 5–10 business days.</p>`
+}
+
+export function refundNoticeText(order: OrderEmailOrder): string {
+  const cents = order.refunded_cents ?? 0
+  if (cents <= 0) return ''
+  return `We've refunded ${fmtPrice(cents)} to your original payment method. `
+    + `It usually appears within 5-10 business days.`
+}
+
+/** The lines covered by one refund, for the partial-refund mail. */
+export function refundedLinesHtml(lines: RefundEmailLine[]): string {
+  return lines.map(l =>
+    `<p style="margin:0 0 6px;font-size:14px;line-height:1.6;color:${ESPRESSO};">`
+    + `${esc(l.product_name)} × ${l.quantity} — ${esc(fmtPrice(l.amount_cents))}</p>`,
+  ).join('\n          ')
+}
+
+export function refundedLinesText(lines: RefundEmailLine[]): string {
+  return lines.map(l => `  ${l.product_name} x ${l.quantity} — ${fmtPrice(l.amount_cents)}`).join('\n')
 }

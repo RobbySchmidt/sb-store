@@ -1624,6 +1624,17 @@ export async function refund(
 }
 ```
 
+**Correction, found during implementation:** the loop above must also **reject a
+duplicate `itemId`**. Every entry is capped against the same `item` object read
+once from the order, so two entries naming the same line each validate against
+the same stale `refunded_quantity` — `[{id, 2}, {id, 2}]` passes both caps on a
+line of 3. Worse, the write loop computes `(p.item.refunded_quantity ?? 0) + p.quantity`
+from that same captured object, so the second `updateItem` writes `2` and
+*overwrites* the first rather than accumulating. **Stripe refunds four units of
+money while the row records two** — the money leaves and the stock does not come
+back. Track seen ids in a `Set` and 400 on a repeat; a caller wanting 4 of one
+line sends one entry with `quantity: 4`.
+
 - [ ] **Step 2: Import `createError`**
 
 `createError` is auto-imported in server *routes* but not inside `server/utils/`. Add to the top of `server/utils/payments.ts`:
@@ -2239,9 +2250,24 @@ In the script block of `app/pages/admin.vue`, after the `cancelTarget` declarati
 const refundTarget = shallowRef<ExpandedOrder | null>(null)
 const refunding = ref(false)
 const refundError = ref<string | null>(null)
+/** Stripe idempotency key for THIS refund attempt. See openRefund(). */
+const refundRequestId = ref('')
 
 function openRefund(order: ExpandedOrder) {
   refundError.value = null
+  // Minted once per dialog OPEN, never per submit. This is load-bearing and the
+  // distinction is the whole reason the key exists.
+  //
+  // Refunding €5 twice on a €20 order is legitimate, so the key cannot be
+  // order-scoped — it would swallow the second, correct refund. But it must
+  // also survive a RETRY of one attempt: if Stripe succeeds and the follow-up
+  // Directus write fails, the route 500s with the money already gone. A fresh
+  // id on the admin's second click would sail past every cap (the re-read still
+  // shows nothing refunded) and take a SECOND real refund out of the remaining
+  // headroom. Same id, and Stripe collapses it to the original.
+  //
+  // Two genuine refunds = two dialog opens = two ids. Correct either way.
+  refundRequestId.value = crypto.randomUUID()
   refundTarget.value = order
 }
 
@@ -2254,10 +2280,7 @@ async function confirmRefund(lines: Array<{ itemId: string; quantity: number }>)
     await $fetch(`/api/admin/orders/${order.id}/refund`, {
       method: 'POST',
       body: {
-        // Per-submit id, not per-order: refunding €5 twice on a €20 order is
-        // legitimate, so an order-scoped key would swallow the second, correct
-        // refund. A retry of THIS submit reuses the id and Stripe collapses it.
-        requestId: crypto.randomUUID(),
+        requestId: refundRequestId.value,
         lines,
       },
     })

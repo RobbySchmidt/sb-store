@@ -8,6 +8,8 @@ import {
   itemLinesText,
   itemsSection,
   oneColSection,
+  refundNoticeHtml,
+  refundNoticeText,
   renderShell,
   renderShellText,
   totalsText,
@@ -25,9 +27,17 @@ export function buildOrderCanceled(order: OrderEmailOrder) {
   const subject = `Order ${order.order_number} has been canceled — Ember & Oak`
 
   const heading = 'Your order has been canceled'
-  const lead = `Order ${esc(order.order_number)} has been canceled. Nothing has been charged. If this is unexpected, just reply to this mail and we'll sort it out.`
+  const refundedHtml = refundNoticeHtml(order)
+  const refundedText = refundNoticeText(order)
+  // A refunded order was definitely charged, so "Nothing has been charged"
+  // would be a lie — drop it and let the refund sentence speak instead.
+  const chargeLine = refundedText
+    ? ''
+    : 'Nothing has been charged. '
+  const lead = `Order ${esc(order.order_number)} has been canceled. ${chargeLine}If this is unexpected, just reply to this mail and we'll sort it out.`
 
-  const { sentence, note, show } = reasonParts(order)
+  const { sentence, note } = reasonParts(order)
+  const show = Boolean(sentence || note || refundedHtml)
 
   const reasonHtml = show
     ? [`<!-- why -->
@@ -38,6 +48,7 @@ export function buildOrderCanceled(order: OrderEmailOrder) {
           note
             ? `<p style="margin:${sentence ? '10px' : '0'} 0 0;font-size:14px;line-height:1.6;color:${MUTED};">${esc(note)}</p>`
             : '',
+          refundedHtml,
         ].filter(Boolean).join('\n          '))}`]
     : []
 
@@ -54,12 +65,12 @@ export function buildOrderCanceled(order: OrderEmailOrder) {
   })
 
   const reasonText = show
-    ? [`WHY\n${[sentence, note].filter(Boolean).map(line => `  ${line}`).join('\n')}`]
+    ? [`WHY\n${[sentence, note, refundedText].filter(Boolean).map(line => `  ${line}`).join('\n')}`]
     : []
 
   const text = renderShellText({
     heading,
-    lead: `Order ${order.order_number} has been canceled. Nothing has been charged. If this is unexpected, just reply to this mail and we'll sort it out.`,
+    lead: `Order ${order.order_number} has been canceled. ${chargeLine}If this is unexpected, just reply to this mail and we'll sort it out.`,
     orderNumber: order.order_number,
     blocks: [
       ...reasonText,

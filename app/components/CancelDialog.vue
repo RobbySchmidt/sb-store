@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import type { EoOrder } from '~~/shared/types/directus'
 
-const props = defineProps<{ order: Pick<EoOrder, 'order_number' | 'customer_name'> }>()
+const props = defineProps<{
+  order: Pick<EoOrder, 'order_number' | 'customer_name' | 'payment_status' | 'total_cents' | 'refunded_cents'>
+}>()
+
+/** What cancelling will return. Zero for an unpaid or already-refunded order. */
+const refundOnCancel = computed(() =>
+  props.order.payment_status === 'paid'
+    ? Math.max(0, props.order.total_cents - props.order.refunded_cents)
+    : 0)
 
 const emit = defineEmits<{
   confirm: [payload: { reason: string | null; note: string | null }]
@@ -122,6 +130,14 @@ onUnmounted(() => {
             class="mt-3 w-full resize-none rounded-xl border border-line bg-cream px-3.5 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted focus:border-terra"
           />
           <p class="mono-label mt-1.5 text-right text-[10px] text-muted">{{ note.length }}/500</p>
+
+          <p
+            v-if="refundOnCancel > 0"
+            class="mt-4 rounded-[10px] bg-cream px-4 py-3 text-[13px] leading-relaxed text-muted"
+          >
+            {{ fmtPrice(refundOnCancel) }} will be refunded to the customer's original
+            payment method, shipping included.
+          </p>
 
           <!-- actions -->
           <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5">

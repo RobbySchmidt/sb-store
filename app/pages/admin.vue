@@ -28,6 +28,33 @@ function itemsCount(order: ExpandedOrder) {
   return order.items.reduce((n, i) => n + i.quantity, 0)
 }
 
+// ---- payment state ----
+/** Refund state is derived from the amounts — there is no `refunded` status. */
+function refundState(order: ExpandedOrder): 'none' | 'partial' | 'full' {
+  if (!order.refunded_cents) return 'none'
+  return order.refunded_cents >= order.total_cents ? 'full' : 'partial'
+}
+
+function paymentLabel(order: ExpandedOrder): string {
+  if (order.payment_status !== 'paid') return order.payment_status
+  const state = refundState(order)
+  if (state === 'full') return 'refunded'
+  // Deliberately no amount here. The badge sits beside the status pill in a
+  // fixed-width column, and `part. refunded €18.40` does not fit — it would
+  // wrap and grow every row. The exact figure is one click away in the expanded
+  // panel, which is the right place for a number you want to read carefully.
+  if (state === 'partial') return 'part. refunded'
+  return 'paid'
+}
+
+function paymentClass(order: ExpandedOrder): string {
+  if (order.payment_status === 'pending') return 'border-line text-muted'
+  if (order.payment_status === 'expired') return 'border-line text-muted line-through'
+  const state = refundState(order)
+  if (state !== 'none') return 'border-[#EAD9AE] bg-[#FBF3E1] text-[#9A7217]'
+  return 'border-status-marked/40 text-status-marked-text'
+}
+
 // ---- header stats ----
 const now = new Date()
 const weekAgo = new Date(now.getTime() - 7 * 86400000)
@@ -116,6 +143,59 @@ function confirmCancel(payload: { reason: string | null; note: string | null }) 
   const order = cancelTarget.value
   cancelTarget.value = null
   if (order) setStatus(order, 'canceled', payload)
+}
+
+// ---- refund dialog ----
+// shallowRef: the entry already is the reactive order object from `orders`
+const refundTarget = shallowRef<ExpandedOrder | null>(null)
+const refunding = ref(false)
+const refundError = ref<string | null>(null)
+/** Stripe idempotency key for THIS refund attempt. See openRefund(). */
+const refundRequestId = ref('')
+
+function openRefund(order: ExpandedOrder) {
+  refundError.value = null
+  // Minted once per dialog OPEN, never per submit. This is load-bearing and the
+  // distinction is the whole reason the key exists.
+  //
+  // Refunding €5 twice on a €20 order is legitimate, so the key cannot be
+  // order-scoped — it would swallow the second, correct refund. But it must
+  // also survive a RETRY of one attempt: if Stripe succeeds and the follow-up
+  // Directus write fails, the route 500s with the money already gone. A fresh
+  // id on the admin's second click would sail past every cap (the re-read still
+  // shows nothing refunded) and take a SECOND real refund out of the remaining
+  // headroom. Same id, and Stripe collapses it to the original.
+  //
+  // Two genuine refunds = two dialog opens = two ids. Correct either way.
+  refundRequestId.value = crypto.randomUUID()
+  refundTarget.value = order
+}
+
+async function confirmRefund(lines: Array<{ itemId: string; quantity: number }>) {
+  const order = refundTarget.value
+  if (!order || refunding.value) return
+  refunding.value = true
+  refundError.value = null
+  try {
+    await $fetch(`/api/admin/orders/${order.id}/refund`, {
+      method: 'POST',
+      body: {
+        requestId: refundRequestId.value,
+        lines,
+      },
+    })
+    refundTarget.value = null
+    // Refetch rather than mutate: refunded_quantity, refunded_cents and the
+    // derived badge all move at once, and the server is the authority on all three.
+    await refresh()
+  } catch (e: any) {
+    // e.data.statusMessage keeps the original text — e.statusMessage is the HTTP
+    // reason phrase, which h3 strips of non-ASCII
+    refundError.value = e?.data?.statusMessage ?? e?.data?.message
+      ?? 'Could not process the refund.'
+  } finally {
+    refunding.value = false
+  }
 }
 
 function toggleExpand(id: string) {
@@ -239,14 +319,14 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
 
       <!-- ===== desktop table ===== -->
       <div class="card mt-5 hidden lg:block overflow-hidden">
-        <div class="mono-label grid grid-cols-[130px_92px_1.2fr_1.5fr_64px_90px_118px_220px] gap-4 bg-cream px-5 py-3.5 text-[10px] font-semibold text-muted">
+        <div class="mono-label grid grid-cols-[130px_92px_1.2fr_1.5fr_64px_90px_186px_220px] gap-4 bg-cream px-5 py-3.5 text-[10px] font-semibold text-muted">
           <span>ORDER</span><span>DATE</span><span>CUSTOMER</span><span>EMAIL</span>
           <span class="text-right">ITEMS</span><span class="text-right">TOTAL</span><span>STATUS</span><span>SET STATUS</span>
         </div>
 
         <template v-for="order in filtered" :key="order.id">
           <div
-            class="grid cursor-pointer grid-cols-[130px_92px_1.2fr_1.5fr_64px_90px_118px_220px] items-center gap-4 border-t border-[#F0EAE0] px-5 py-3.5 transition-colors hover:bg-[#FDFBF7]"
+            class="grid cursor-pointer grid-cols-[130px_92px_1.2fr_1.5fr_64px_90px_186px_220px] items-center gap-4 border-t border-[#F0EAE0] px-5 py-3.5 transition-colors hover:bg-[#FDFBF7]"
             @click="toggleExpand(order.id)"
           >
             <span class="flex items-center gap-2 font-mono text-[13px] font-semibold">
@@ -263,6 +343,10 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                 <span class="h-[7px] w-[7px] rounded-full" :class="badgeStyles[order.status].dot" />
                 {{ badgeStyles[order.status].label }}
               </span>
+              <span
+                class="mono-label ml-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold"
+                :class="paymentClass(order)"
+              >{{ paymentLabel(order) }}</span>
             </span>
             <span class="flex rounded-full border border-line bg-white p-0.5" @click.stop>
               <button
@@ -284,7 +368,12 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                 <p class="mono-label text-[10px] font-semibold text-muted">LINE ITEMS</p>
                 <div class="mt-3 space-y-2">
                   <div v-for="(item, i) in order.items" :key="i" class="flex justify-between text-[13px]">
-                    <span>{{ item.product_name }} × {{ item.quantity }}</span>
+                    <span>
+                      {{ item.product_name }} × {{ item.quantity }}
+                      <span v-if="item.refunded_quantity" class="text-[#9A7217]">
+                        ({{ item.refunded_quantity }} refunded)
+                      </span>
+                    </span>
                     <span class="font-medium">{{ fmtPrice(item.unit_price_cents * item.quantity) }}</span>
                   </div>
                   <div class="flex justify-between border-t border-line pt-2 text-[13px]">
@@ -292,6 +381,10 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                     <span :class="order.shipping_cents === 0 ? 'font-medium text-status-marked-text' : 'font-medium'">
                       {{ order.shipping_cents === 0 ? 'Free' : fmtPrice(order.shipping_cents) }}
                     </span>
+                  </div>
+                  <div v-if="order.refunded_cents > 0" class="flex justify-between border-t border-line pt-2 text-[13px] text-[#9A7217]">
+                    <span>Refunded</span>
+                    <span class="font-medium">− {{ fmtPrice(order.refunded_cents) }}</span>
                   </div>
                 </div>
               </div>
@@ -315,6 +408,16 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                   {{ order.cancel_note }}
                 </p>
               </div>
+            </div>
+
+            <div v-if="order.payment_status === 'paid' && order.refunded_cents < order.total_cents && order.stripe_payment_intent" class="mt-4">
+              <button
+                type="button"
+                class="text-sm font-medium text-terra transition-colors hover:text-terra-dark"
+                @click.stop="openRefund(order)"
+              >
+                Refund items…
+              </button>
             </div>
           </div>
         </template>
@@ -343,9 +446,15 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
         <div v-for="order in filtered" :key="order.id" class="card p-5">
           <button class="flex w-full items-center justify-between" @click="toggleExpand(order.id)">
             <span class="font-mono text-[14px] font-semibold">{{ shortNo(order) }}</span>
-            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" :class="[badgeStyles[order.status].bg, badgeStyles[order.status].text]">
-              <span class="h-[7px] w-[7px] rounded-full" :class="badgeStyles[order.status].dot" />
-              {{ badgeStyles[order.status].label }}
+            <span class="flex items-center">
+              <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" :class="[badgeStyles[order.status].bg, badgeStyles[order.status].text]">
+                <span class="h-[7px] w-[7px] rounded-full" :class="badgeStyles[order.status].dot" />
+                {{ badgeStyles[order.status].label }}
+              </span>
+              <span
+                class="mono-label ml-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold"
+                :class="paymentClass(order)"
+              >{{ paymentLabel(order) }}</span>
             </span>
           </button>
           <p class="mt-3 text-sm font-medium">{{ order.customer_name }}</p>
@@ -359,8 +468,17 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
             <p class="mono-label text-[10px] font-semibold text-muted">LINE ITEMS</p>
             <div class="mt-2.5 space-y-1.5">
               <div v-for="(item, i) in order.items" :key="i" class="flex justify-between text-[13px]">
-                <span>{{ item.product_name }} × {{ item.quantity }}</span>
+                <span>
+                  {{ item.product_name }} × {{ item.quantity }}
+                  <span v-if="item.refunded_quantity" class="text-[#9A7217]">
+                    ({{ item.refunded_quantity }} refunded)
+                  </span>
+                </span>
                 <span class="font-medium">{{ fmtPrice(item.unit_price_cents * item.quantity) }}</span>
+              </div>
+              <div v-if="order.refunded_cents > 0" class="flex justify-between border-t border-line pt-2 text-[13px] text-[#9A7217]">
+                <span>Refunded</span>
+                <span class="font-medium">− {{ fmtPrice(order.refunded_cents) }}</span>
               </div>
             </div>
             <p class="mono-label mt-4 text-[10px] font-semibold text-muted">SHIPS TO</p>
@@ -376,6 +494,16 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
                 {{ order.cancel_note }}
               </p>
             </template>
+
+            <div v-if="order.payment_status === 'paid' && order.refunded_cents < order.total_cents && order.stripe_payment_intent" class="mt-4">
+              <button
+                type="button"
+                class="text-sm font-medium text-terra transition-colors hover:text-terra-dark"
+                @click.stop="openRefund(order)"
+              >
+                Refund items…
+              </button>
+            </div>
           </div>
 
           <div class="mt-4 flex rounded-full border border-line bg-white p-0.5">
@@ -402,6 +530,15 @@ useHead({ title: 'Orders — Ember & Oak Admin' })
       :order="cancelTarget"
       @close="cancelTarget = null"
       @confirm="confirmCancel"
+    />
+
+    <RefundDialog
+      v-if="refundTarget"
+      :order="refundTarget"
+      :busy="refunding"
+      :error="refundError"
+      @close="refundTarget = null"
+      @confirm="confirmRefund"
     />
   </div>
 </template>

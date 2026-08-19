@@ -1,6 +1,5 @@
-import { readItems, createItem, createItems, deleteItem } from '@directus/sdk'
+import { readItems, createItem, createItems, deleteItem, updateItem } from '@directus/sdk'
 import { FREE_SHIPPING_CENTS, SHIPPING_FLAT_CENTS } from '../../shared/utils/shop'
-import { sendOrderConfirmation } from '../utils/email/confirmation'
 
 interface OrderPayload {
   customer: {
@@ -49,6 +48,11 @@ export default defineEventHandler(async (event) => {
 
   const db = directus()
 
+  // Release stock from checkouts that were abandoned long enough ago. Runs
+  // here because this is the one place a stale hold actually costs a sale.
+  // markExpired()'s guard makes a redundant sweep free.
+  await sweepExpired().catch(err => console.error('[sweep] failed:', err))
+
   // Optional — guest checkout stays supported. currentUser() never throws.
   const user = await currentUser(event)
 
@@ -77,8 +81,26 @@ export default defineEventHandler(async (event) => {
   // carts and an oversell.
   const order = await withStockLock(async () => {
     const avail = await availabilityFor(ids)
-    const short = lines
-      .map(l => ({ name: l.product_name, want: l.quantity, have: avail.get(l.product) ?? 0 }))
+
+    // Sum the demand per product BEFORE comparing. `ids` is deduplicated but
+    // `lines` is not, so two lines for the same product would each be checked
+    // against the same availability figure and both pass independently: six in
+    // stock, a body of [{X, qty:5}, {X, qty:5}], `6 < 5` false twice, and the
+    // order inserts ten units. The lock does not help — it is not a race, it is
+    // a comparison against the wrong number.
+    //
+    // The cart merges by productId (app/stores/cart.ts), so the UI cannot
+    // produce this. The endpoint is public, so curl can.
+    const wanted = new Map<string, { name: string, want: number }>()
+    for (const l of lines) {
+      const prev = wanted.get(l.product)
+      wanted.set(l.product, {
+        name: l.product_name,
+        want: (prev?.want ?? 0) + l.quantity,
+      })
+    }
+    const short = [...wanted.entries()]
+      .map(([pid, w]) => ({ name: w.name, want: w.want, have: avail.get(pid) ?? 0 }))
       .filter(s => s.have < s.want)
 
     if (short.length) {
@@ -102,6 +124,7 @@ export default defineEventHandler(async (event) => {
       subtotal_cents: subtotal,
       shipping_cents: shipping,
       total_cents: total,
+      payment_status: 'pending',
     }))
 
     try {
@@ -123,13 +146,57 @@ export default defineEventHandler(async (event) => {
     return { ...l, product: { id: p.id, slug: p.slug, image: p.image } }
   })
 
-  // Fire-and-forget: a mail failure must never fail an order that is already stored
   const full = { ...order, items: displayLines }
-  event.waitUntil(
-    sendOrderConfirmation(full as any).catch(err =>
-      console.error(`[mail] confirmation for ${order.order_number} failed:`, err),
-    ),
-  )
 
-  return full
+  /**
+   * Undo a stored order that can never be paid.
+   *
+   * Leaving one behind is not cosmetic: it holds stock until the sweep reaches
+   * it 45 minutes later, and the buyer — who just saw an error — will retry,
+   * stranding another. Two retries against the last few bags hand a genuine
+   * "only 1 left" to a different customer for stock nobody bought.
+   *
+   * CASCADE on eo_order_items.order takes the lines with it (setup.ts).
+   * A failure here is logged rather than swallowed: it is precisely the case
+   * where you would want to know why stock sat held.
+   */
+  const discardOrder = async (why: string, cause: unknown) => {
+    console.error(`[checkout] discarding ${order.order_number} — ${why}:`, cause)
+    await db.request(deleteItem('eo_orders', order.id)).catch(err =>
+      console.error(`[checkout] cleanup of ${order.order_number} ALSO failed; it will hold stock until the sweep:`, err),
+    )
+  }
+
+  // Stripe is called OUTSIDE the stock lock: a network round-trip in there
+  // would serialise every checkout in the app behind Stripe's latency.
+  let session
+  try {
+    session = await createCheckoutSession(full)
+  } catch (e) {
+    await discardOrder('Stripe session creation failed', e)
+    throw createError({ statusCode: 502, statusMessage: 'Could not reach the payment provider. Nothing has been charged.' })
+  }
+
+  // `url` is typed nullable — Stripe only populates it while the session is
+  // active. Always set for mode:'payment', but a null would mean the buyer
+  // holds stock with nowhere to pay and no error raised, so treat it like any
+  // other session failure rather than returning it.
+  if (!session.url) {
+    await discardOrder('Stripe returned a session with no URL', session.id)
+    throw createError({ statusCode: 502, statusMessage: 'Could not reach the payment provider. Nothing has been charged.' })
+  }
+
+  // The third place an order can be orphaned. Without this the row survives
+  // holding stock, with no session id for any webhook to reference, and the
+  // buyer gets a raw 500 instead of the handled 502 above.
+  try {
+    await db.request(updateItem('eo_orders', order.id, { stripe_session_id: session.id }))
+  } catch (e) {
+    await discardOrder('could not record the Stripe session id', e)
+    throw createError({ statusCode: 502, statusMessage: 'Could not start the payment. Nothing has been charged.' })
+  }
+
+  // No confirmation mail here any more — it moved to markPaid(). An order that
+  // is never paid must never be confirmed.
+  return { order: full, checkoutUrl: session.url }
 })
